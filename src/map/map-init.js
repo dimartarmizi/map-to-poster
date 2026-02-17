@@ -43,7 +43,6 @@ export function initMap(containerId, initialCenter, initialZoom, initialTileUrl)
 		isSyncing = false;
 	});
 
-	// Init Artistic Map (hidden initially)
 	initArtisticMap('artistic-map', [initialCenter[1], initialCenter[0]], initialZoom - 1);
 
 	return map;
@@ -52,17 +51,16 @@ export function initMap(containerId, initialCenter, initialZoom, initialTileUrl)
 function initArtisticMap(containerId, center, zoom) {
 	artisticMap = new maplibregl.Map({
 		container: containerId,
-		style: { version: 8, sources: {}, layers: [] }, // Empty initially
+		style: { version: 8, sources: {}, layers: [] },
 		center: center,
 		zoom: zoom,
-		interactive: true, // Enable interactivity
+		interactive: true,
 		attributionControl: false,
-		preserveDrawingBuffer: true // Required for exporting to PNG
+		preserveDrawingBuffer: true
 	});
 
-	// Handle zoom when scrolling over artistic map (center zoom)
 	artisticMap.scrollZoom.setWheelZoomRate(1);
-	artisticMap.scrollZoom.setZoomRate(1/600);
+	artisticMap.scrollZoom.setZoomRate(1 / 600);
 
 	artisticMap.on('moveend', () => {
 		if (isSyncing) return;
@@ -70,11 +68,11 @@ function initArtisticMap(containerId, center, zoom) {
 
 		const center = artisticMap.getCenter();
 		const zoom = artisticMap.getZoom();
-		
+
 		updateState({
 			lat: center.lat,
 			lon: center.lng,
-			zoom: zoom + 1 
+			zoom: zoom + 1
 		});
 
 		if (map) {
@@ -216,6 +214,10 @@ export function waitForTilesLoad(timeout = 5000) {
 
 export function getMapInstance() {
 	return map;
+}
+
+export function getArtisticMapInstance() {
+	return artisticMap;
 }
 
 export function invalidateMapSize() {
