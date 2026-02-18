@@ -1,6 +1,7 @@
 import { state, updateState, getSelectedTheme, getSelectedArtisticTheme } from '../core/state.js';
 import { artisticThemes } from '../core/artistic-themes.js';
 import { themes } from '../core/themes.js';
+import { outputPresets } from '../core/output-presets.js';
 import { updateMapPosition, invalidateMapSize, updateArtisticStyle } from '../map/map-init.js';
 import { searchLocation, formatCoords } from '../map/geocoder.js';
 
@@ -10,6 +11,7 @@ export function setupControls() {
 	const searchLoading = document.getElementById('search-loading');
 	const latInput = document.getElementById('lat-input');
 	const lonInput = document.getElementById('lon-input');
+	const cityOverrideInput = document.getElementById('city-override-input');
 	const zoomSlider = document.getElementById('zoom-slider');
 	const zoomValue = document.getElementById('zoom-value');
 
@@ -54,6 +56,62 @@ export function setupControls() {
 	const presetBtns = document.querySelectorAll('.preset-btn');
 	const exportBtn = document.getElementById('export-btn');
 
+	const otherPresetsBtn = document.getElementById('other-presets-btn');
+	const presetsModal = document.getElementById('presets-modal');
+	const closeModal = document.getElementById('close-modal');
+	const closeModalBtn = document.getElementById('close-modal-btn');
+	const modalContent = document.getElementById('modal-content');
+	const modalOverlay = document.getElementById('modal-overlay');
+
+	if (otherPresetsBtn) {
+		otherPresetsBtn.addEventListener('click', () => {
+			presetsModal.classList.add('show');
+			populateModal();
+		});
+	}
+
+	const closeFunctions = [closeModal, closeModalBtn, modalOverlay];
+	closeFunctions.forEach(el => {
+		if (el) {
+			el.addEventListener('click', () => {
+				if (presetsModal) presetsModal.classList.remove('show');
+			});
+		}
+	});
+
+	function populateModal() {
+		if (!modalContent) return;
+		modalContent.innerHTML = Object.entries(outputPresets).map(([key, presets]) => `
+      <div class="space-y-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-1 h-5 bg-accent rounded-full"></div>
+          <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">${key.replace('_', ' ')}</h3>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          ${presets.map(p => {
+			const isActive = state.width === p.width && state.height === p.height;
+			return `
+              <button class="modal-preset-btn group flex flex-col items-start p-4 border ${isActive ? 'border-accent bg-accent-light' : 'border-slate-100 bg-slate-50/50'} rounded-2xl hover:border-accent hover:bg-white hover:shadow-xl transition-all text-left" 
+                      data-width="${p.width}" data-height="${p.height}">
+                <span class="text-[11px] font-bold ${isActive ? 'text-accent' : 'text-slate-800'} group-hover:text-accent transition-colors">${p.name}</span>
+                <span class="text-[9px] ${isActive ? 'text-accent/60' : 'text-slate-400'} font-bold mt-1 uppercase tracking-tight">${p.width} × ${p.height} px</span>
+              </button>
+            `;
+		}).join('')}
+        </div>
+      </div>
+    `).join('');
+
+		modalContent.querySelectorAll('.modal-preset-btn').forEach(btn => {
+			btn.addEventListener('click', () => {
+				const width = parseInt(btn.dataset.width);
+				const height = parseInt(btn.dataset.height);
+				updateState({ width, height });
+				presetsModal.classList.remove('show');
+			});
+		});
+	}
+
 	let searchTimeout;
 	searchInput.addEventListener('input', (e) => {
 		clearTimeout(searchTimeout);
@@ -88,7 +146,10 @@ export function setupControls() {
 			const lon = parseFloat(item.dataset.lon);
 			const name = item.dataset.name;
 
-			updateState({ city: name.toUpperCase(), lat, lon });
+			if (!cityOverrideInput || !cityOverrideInput.value.trim()) {
+				updateState({ city: name.toUpperCase() });
+			}
+			updateState({ lat, lon });
 			updateMapPosition(lat, lon);
 
 			searchInput.value = name;
@@ -107,6 +168,14 @@ export function setupControls() {
 		updateState({ lon });
 		updateMapPosition(state.lat, lon);
 	});
+
+	if (cityOverrideInput) {
+		cityOverrideInput.value = state.cityOverride || '';
+		cityOverrideInput.addEventListener('input', (e) => {
+			const v = e.target.value;
+			updateState({ cityOverride: v ? v.toUpperCase() : '' });
+		});
+	}
 
 
 	function sanitizeCoordInput(v) {
@@ -197,6 +266,7 @@ export function setupControls() {
 	customH.addEventListener('change', (e) => updateState({ height: parseInt(e.target.value) || state.height }));
 
 	return (currentState) => {
+		if (cityOverrideInput) cityOverrideInput.value = currentState.cityOverride || '';
 		latInput.value = currentState.lat.toFixed(6);
 		lonInput.value = currentState.lon.toFixed(6);
 		zoomSlider.value = currentState.zoom;
@@ -257,6 +327,32 @@ export function setupControls() {
 
 		customW.value = currentState.width;
 		customH.value = currentState.height;
+
+		let isMainPresetActive = false;
+		if (presetBtns && presetBtns.length) {
+			presetBtns.forEach(btn => {
+				const w = parseInt(btn.dataset.width);
+				const h = parseInt(btn.dataset.height);
+				if (w === currentState.width && h === currentState.height) {
+					btn.classList.add('bg-accent', 'text-white');
+					btn.classList.remove('bg-slate-50');
+					isMainPresetActive = true;
+				} else {
+					btn.classList.remove('bg-accent', 'text-white');
+					btn.classList.add('bg-slate-50');
+				}
+			});
+		}
+
+		if (otherPresetsBtn) {
+			if (!isMainPresetActive) {
+				otherPresetsBtn.classList.add('bg-accent', 'text-white');
+				otherPresetsBtn.classList.remove('bg-slate-50');
+			} else {
+				otherPresetsBtn.classList.remove('bg-accent', 'text-white');
+				otherPresetsBtn.classList.add('bg-slate-50');
+			}
+		}
 
 		let accentColor = '#0f172a';
 		if (currentState.renderMode === 'artistic') {
@@ -329,7 +425,7 @@ export function updatePreviewStyles(currentState) {
 
 	posterScaler.style.transform = `scale(${scale})`;
 
-	displayCity.textContent = currentState.city;
+	displayCity.textContent = (currentState.cityOverride && currentState.cityOverride.length) ? currentState.cityOverride : currentState.city;
 	displayCity.style.color = activeTheme.text || activeTheme.textColor;
 	displayCoords.textContent = formatCoords(currentState.lat, currentState.lon);
 	displayCoords.style.color = activeTheme.text || activeTheme.textColor;

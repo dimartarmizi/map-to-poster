@@ -7,6 +7,7 @@ const STORAGE_KEY = 'map-to-poster:settings';
 
 export const state = {
 	city: "JAKARTA",
+	cityOverride: "",
 	lat: -6.2088,
 	lon: 106.8456,
 	zoom: 12,
@@ -23,6 +24,7 @@ export const state = {
 
 const SAVED_KEYS = [
 	'city',
+	'cityOverride',
 	'lat',
 	'lon',
 	'zoom',

@@ -28,6 +28,7 @@
 			.sidebar-open aside {
 				transform: translateX(0);
 			}
+
 			.sidebar-open .sidebar-overlay {
 				opacity: 1;
 				pointer-events: auto;
@@ -86,6 +87,11 @@
 							</div>
 						</div>
 						<div id="search-results" class="absolute left-0 right-0 mt-2 bg-white border border-slate-200 rounded-2xl shadow-xl z-[100] hidden max-h-64 overflow-y-auto p-2 backdrop-blur-xl"></div>
+					</div>
+
+					<div class="mt-2">
+						<span class="label-sm">Override City Name</span>
+						<input type="text" id="city-override-input" placeholder="Leave blank to use search result" class="input-field mt-1" />
 					</div>
 
 					<div class="grid grid-cols-2 gap-3">
@@ -189,27 +195,27 @@
 
 			<div class="space-y-4">
 				<div class="flex items-center justify-between">
-					<h3 class="text-sm font-semibold text-slate-900">4. Output Format</h3>
+					<h3 class="text-sm font-semibold text-slate-900">4. Output Size</h3>
 					<span class="w-5 h-5 bg-slate-100 rounded-md flex items-center justify-center text-[10px] font-bold text-slate-400">04</span>
 				</div>
 
 				<div class="space-y-4">
 					<div class="grid grid-cols-2 gap-2">
-						<button class="preset-btn px-4 py-3 text-[11px] font-semibold border border-slate-100 bg-slate-50 rounded-xl hover:bg-white hover:border-accent hover:shadow-sm transition-all duration-200 flex flex-col items-center justify-center space-y-1" data-width="2480" data-height="3508">
-							<span class="text-slate-900">A4 Paper</span>
-							<span class="text-[9px] text-slate-400 font-normal">2480 × 3508</span>
-						</button>
 						<button class="preset-btn px-4 py-3 text-[11px] font-semibold border border-slate-100 bg-slate-50 rounded-xl hover:bg-white hover:border-accent hover:shadow-sm transition-all duration-200 flex flex-col items-center justify-center space-y-1" data-width="1080" data-height="1080">
-							<span class="text-slate-900">Instagram</span>
-							<span class="text-[9px] text-slate-400 font-normal">1080 × 1080</span>
+							<span>Square</span>
+							<span class="text-[9px] font-normal">1080 × 1080</span>
 						</button>
 						<button class="preset-btn px-4 py-3 text-[11px] font-semibold border border-slate-100 bg-slate-50 rounded-xl hover:bg-white hover:border-accent hover:shadow-sm transition-all duration-200 flex flex-col items-center justify-center space-y-1" data-width="1080" data-height="1920">
-							<span class="text-slate-900">Story</span>
-							<span class="text-[9px] text-slate-400 font-normal">1080 × 1920</span>
+							<span>Portrait</span>
+							<span class="text-[9px] font-normal">1080 × 1920</span>
 						</button>
-						<button class="preset-btn px-4 py-3 text-[11px] font-semibold border border-slate-100 bg-slate-50 rounded-xl hover:bg-white hover:border-accent hover:shadow-sm transition-all duration-200 flex flex-col items-center justify-center space-y-1" data-width="3508" data-height="2480">
-							<span class="text-slate-900">Landscape</span>
-							<span class="text-[9px] text-slate-400 font-normal">3508 × 2480</span>
+						<button class="preset-btn px-4 py-3 text-[11px] font-semibold border border-slate-100 bg-slate-50 rounded-xl hover:bg-white hover:border-accent hover:shadow-sm transition-all duration-200 flex flex-col items-center justify-center space-y-1" data-width="1920" data-height="1080">
+							<span>Landscape</span>
+							<span class="text-[9px] font-normal">1920 × 1080</span>
+						</button>
+						<button id="other-presets-btn" class="px-4 py-3 text-[11px] font-semibold border border-slate-100 bg-slate-50 rounded-xl hover:bg-white hover:border-accent hover:shadow-sm transition-all duration-200 flex flex-col items-center justify-center space-y-1">
+							<span>Other</span>
+							<span class="text-[9px] font-normal">More Sizes</span>
 						</button>
 					</div>
 
@@ -275,6 +281,30 @@
 			</div>
 		</div>
 	</main>
+
+	<div id="presets-modal" class="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300">
+		<div id="modal-overlay" class="absolute inset-0 bg-slate-900/60 backdrop-blur-md"></div>
+		<div class="relative w-[90%] max-w-2xl max-h-[85vh] bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col scale-95 transition-transform duration-300">
+			<div class="p-8 border-b border-slate-100 flex items-center justify-between">
+				<div>
+					<h2 class="text-2xl font-bold text-slate-900">Output Presets</h2>
+					<p class="text-xs text-slate-400 font-medium uppercase tracking-wider mt-1">Select your poster dimensions</p>
+				</div>
+				<button id="close-modal" class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-100 transition-colors">
+					<svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+
+			<div id="modal-content" class="flex-1 overflow-y-auto p-8 space-y-10 no-scrollbar">
+			</div>
+
+			<div class="p-6 bg-slate-50 border-t border-slate-100 flex justify-end">
+				<button id="close-modal-btn" class="px-6 py-2.5 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-accent transition-colors">Done</button>
+			</div>
+		</div>
+	</div>
 
 	<script type="module" src="/main.js"></script>
 	<script>

@@ -100,6 +100,22 @@
 	transition: width 0.3s ease, height 0.3s ease, background-color 0.3s ease;
 }
 
+#presets-modal.show {
+	@apply opacity-100 pointer-events-auto;
+}
+
+#presets-modal.show > div:last-child {
+	@apply scale-100;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+	display: none;
+}
+.no-scrollbar {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
 #mode-tile.active,
 #mode-artistic.active {
 	@apply bg-accent text-white shadow-sm;
