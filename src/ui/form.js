@@ -1,9 +1,11 @@
 import { state, updateState, getSelectedTheme, getSelectedArtisticTheme } from '../core/state.js';
+import { hexToRgba } from '../core/utils.js';
 import { artisticThemes } from '../core/artistic-themes.js';
 import { themes } from '../core/themes.js';
 import { outputPresets } from '../core/output-presets.js';
 import { updateMapPosition, invalidateMapSize, updateArtisticStyle, updateMapTheme } from '../map/map-init.js';
 import { searchLocation, formatCoords } from '../map/geocoder.js';
+
 
 export function setupControls() {
 	const searchInput = document.getElementById('search-input');
@@ -272,7 +274,6 @@ export function setupControls() {
 		if (state.renderMode === 'artistic') {
 			const theme = getSelectedArtisticTheme();
 			updateArtisticStyle(theme);
-			invalidateMapSize();
 		}
 	});
 
@@ -449,18 +450,20 @@ export function updatePreviewStyles(currentState) {
 	const mapPreview = document.getElementById('map-preview');
 	const artisticMapDiv = document.getElementById('artistic-map');
 
+	const activeTheme = isArtistic ? artisticTheme : theme;
+
 	if (isArtistic) {
 		mapPreview.style.visibility = 'hidden';
+		mapPreview.style.pointerEvents = 'none';
 		artisticMapDiv.style.visibility = 'visible';
 		artisticMapDiv.style.pointerEvents = 'auto';
 		updateArtisticStyle(artisticTheme);
 	} else {
 		mapPreview.style.visibility = 'visible';
+		mapPreview.style.pointerEvents = 'auto';
 		artisticMapDiv.style.visibility = 'hidden';
 		artisticMapDiv.style.pointerEvents = 'none';
 	}
-
-	const activeTheme = isArtistic ? artisticTheme : theme;
 
 	const sizeChanged = lastWidth !== currentState.width || lastHeight !== currentState.height;
 	lastWidth = currentState.width;
@@ -522,7 +525,7 @@ export function updatePreviewStyles(currentState) {
 			displayCoords.style.fontSize = `${coordsSize}px`;
 
 			const bgType = currentState.overlayBgType || 'vignette';
-			const color = activeTheme.overlayBg || activeTheme.background || activeTheme.bg;
+			const color = activeTheme.background || activeTheme.bg || activeTheme.overlayBg || '#ffffff';
 
 			if (overlayBg) {
 				overlayBg.style.display = 'none';
@@ -534,7 +537,9 @@ export function updatePreviewStyles(currentState) {
 				if (bgType === 'vignette') {
 					vignetteOverlay.style.display = '';
 					vignetteOverlay.style.opacity = '1';
-					vignetteOverlay.style.background = `linear-gradient(to bottom, ${color} 0%, ${color} 3%, transparent 20%, transparent 80%, ${color} 97%, ${color} 100%)`;
+					const colorSolid = hexToRgba(color, 1);
+					const colorTrans = hexToRgba(color, 0);
+					vignetteOverlay.style.background = `linear-gradient(to bottom, ${colorSolid} 0%, ${colorSolid} 3%, ${colorTrans} 20%, ${colorTrans} 80%, ${colorSolid} 97%, ${colorSolid} 100%)`;
 				} else {
 					vignetteOverlay.style.display = 'none';
 				}
@@ -542,8 +547,6 @@ export function updatePreviewStyles(currentState) {
 		}
 	}
 	if (divider) divider.style.backgroundColor = activeTheme.text || activeTheme.textColor;
-
-	invalidateMapSize();
 
 	if (sizeChanged) {
 		setTimeout(() => {

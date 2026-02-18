@@ -82,7 +82,7 @@ function notifyObservers() {
 }
 
 export function getSelectedTheme() {
-	return themes[state.theme] || themes.minimal;
+	return themes[state.theme] || themes.standard || themes.minimal;
 }
 
 export function getSelectedArtisticTheme() {

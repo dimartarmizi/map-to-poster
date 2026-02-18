@@ -1,6 +1,7 @@
 import html2canvas from 'html2canvas';
 import { getMapInstance, getArtisticMapInstance } from '../map/map-init.js';
-import { state } from './state.js';
+import { state, getSelectedTheme, getSelectedArtisticTheme } from './state.js';
+import { hexToRgba } from './utils.js';
 
 async function captureMapSnapshot() {
 	const artisticContainer = document.getElementById('artistic-map');
@@ -112,6 +113,13 @@ export async function exportToPNG(element, filename, statusElement, options = {}
 				return el.id === 'map-preview' || el.id === 'artistic-map' || el.classList.contains('leaflet-control-container');
 			},
 			onclone: (clonedDoc) => {
+				const isArtistic = state.renderMode === 'artistic';
+				const theme = getSelectedTheme();
+				const artisticTheme = getSelectedArtisticTheme();
+				const activeTheme = isArtistic ? artisticTheme : theme;
+				const themeColor = activeTheme.background || activeTheme.bg || activeTheme.overlayBg || '#ffffff';
+				const textColor = activeTheme.text || activeTheme.textColor || '#000000';
+
 				const clonedScaler = clonedDoc.querySelector('#poster-scaler');
 				const clonedContainer = clonedDoc.querySelector('#poster-container');
 				const clonedMain = clonedDoc.querySelector('main');
@@ -145,6 +153,7 @@ export async function exportToPNG(element, filename, statusElement, options = {}
 					clonedContainer.style.margin = '0';
 					clonedContainer.style.boxShadow = 'none';
 					clonedContainer.style.overflow = 'hidden';
+					clonedContainer.style.backgroundColor = activeTheme.background || activeTheme.bg || '#ffffff';
 
 					const cMap = clonedDoc.querySelector('#map-preview');
 					const cArt = clonedDoc.querySelector('#artistic-map');
@@ -169,7 +178,6 @@ export async function exportToPNG(element, filename, statusElement, options = {}
 				const overlay = clonedDoc.querySelector('#poster-overlay');
 				if (overlay) {
 					overlay.style.transform = 'none';
-					overlay.style.transform = 'none';
 					overlay.style.position = 'absolute';
 					overlay.style.left = '0';
 					overlay.style.right = '0';
@@ -188,6 +196,7 @@ export async function exportToPNG(element, filename, statusElement, options = {}
 						clonedOverlayBg.style.height = '100%';
 						clonedOverlayBg.style.pointerEvents = 'none';
 						clonedOverlayBg.style.zIndex = '1';
+						clonedOverlayBg.style.display = 'none';
 					}
 				}
 
@@ -202,28 +211,46 @@ export async function exportToPNG(element, filename, statusElement, options = {}
 					clonedVignette.style.height = '100%';
 					clonedVignette.style.pointerEvents = 'none';
 					clonedVignette.style.zIndex = '2';
-				}
 
-				const city = clonedDoc.querySelector('#display-city');
-				if (city) city.style.transform = 'none';
-
-				const opts = Object.assign({ dividerOffset: 72 }, options || {});
-				const dividerOffset = typeof opts.dividerOffset === 'number' ? opts.dividerOffset : 0;
-
-				const clonedDivider = clonedDoc.querySelector('#poster-divider');
-				if (dividerOffset && clonedDivider) {
-					if (dividerOffset > 0) {
-						city.style.marginBottom = (parseFloat(city.style.marginBottom || '0') + dividerOffset) + 'px';
+					if (state.overlayBgType === 'vignette') {
+						clonedVignette.style.display = 'block';
+						clonedVignette.style.opacity = '1';
+						const colorSolid = hexToRgba(themeColor, 1);
+						const colorTrans = hexToRgba(themeColor, 0);
+						clonedVignette.style.background = `linear-gradient(to bottom, ${colorSolid} 0%, ${colorSolid} 3%, ${colorTrans} 20%, ${colorTrans} 80%, ${colorSolid} 97%, ${colorSolid} 100%)`;
 					} else {
-						clonedDivider.style.marginTop = (parseFloat(clonedDivider.style.marginTop || '0') + dividerOffset) + 'px';
+						clonedVignette.style.display = 'none';
 					}
 				}
 
-				const coords = clonedDoc.querySelector('#display-coords');
-				if (coords) coords.style.transform = 'none';
+				const city = clonedDoc.querySelector('#display-city');
+				if (city) {
+					city.style.transform = 'none';
+					city.style.color = textColor;
+				}
 
-				const clonedDivider2 = clonedDoc.querySelector('#poster-divider');
-				if (clonedDivider2) clonedDivider2.style.transform = 'none';
+				const coords = clonedDoc.querySelector('#display-coords');
+				if (coords) {
+					coords.style.transform = 'none';
+					coords.style.color = textColor;
+				}
+
+				const clonedDivider = clonedDoc.querySelector('#poster-divider');
+				if (clonedDivider) {
+					clonedDivider.style.transform = 'none';
+					clonedDivider.style.backgroundColor = textColor;
+
+					const opts = Object.assign({ dividerOffset: 72 }, options || {});
+					const dividerOffset = typeof opts.dividerOffset === 'number' ? opts.dividerOffset : 0;
+
+					if (dividerOffset && city) {
+						if (dividerOffset > 0) {
+							city.style.marginBottom = (parseFloat(city.style.marginBottom || '0') + dividerOffset) + 'px';
+						} else {
+							clonedDivider.style.marginTop = (parseFloat(clonedDivider.style.marginTop || '0') + dividerOffset) + 'px';
+						}
+					}
+				}
 			}
 		});
 
