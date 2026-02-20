@@ -635,6 +635,7 @@ export function updatePreviewStyles(currentState) {
 	const vignetteOverlay = document.getElementById('vignette-overlay');
 	const matBorder = document.getElementById('mat-border');
 	const divider = document.getElementById('poster-divider');
+	const attribution = document.getElementById('poster-attribution');
 
 	const theme = getSelectedTheme();
 	const artisticTheme = getSelectedArtisticTheme();
@@ -806,6 +807,11 @@ export function updatePreviewStyles(currentState) {
 		}
 	}
 	if (divider) divider.style.backgroundColor = activeTheme.text || activeTheme.textColor;
+	if (attribution) {
+		attribution.style.color = activeTheme.text || activeTheme.textColor;
+		attribution.style.right = `${matWidth + 12}px`;
+		attribution.style.bottom = `${matWidth + 12}px`;
+	}
 
 	updateMarkerStyles(currentState);
 

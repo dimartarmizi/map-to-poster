@@ -366,6 +366,16 @@ export async function exportToPNG(element, filename, statusElement, options = {}
 					coords.style.fontFamily = state.coordsFont;
 				}
 
+				const attr = clonedDoc.querySelector('#poster-attribution');
+				if (attr) {
+					attr.style.color = textColor;
+					const matWidthLogical = state.matEnabled ? (state.matWidth / scale) : 0;
+					attr.style.right = `${matWidthLogical + (12 / scale)}px`;
+					attr.style.bottom = `${matWidthLogical + (12 / scale)}px`;
+					attr.style.fontSize = `${8 / scale}px`;
+					attr.style.opacity = '0.35';
+				}
+
 				const clonedDivider = clonedDoc.querySelector('#poster-divider');
 				if (clonedDivider) {
 					clonedDivider.style.transform = 'none';
