@@ -97,6 +97,26 @@ export function setupControls() {
 		});
 	}
 
+	const logoBtn = document.getElementById('logo-btn');
+	const creditsModal = document.getElementById('credits-modal');
+	const closeCredits = document.getElementById('close-credits');
+	const creditsOverlay = document.getElementById('credits-overlay');
+
+	if (logoBtn) {
+		logoBtn.addEventListener('click', () => {
+			if (creditsModal) creditsModal.classList.add('show');
+		});
+	}
+
+	const closeCreditsFunctions = [closeCredits, creditsOverlay];
+	closeCreditsFunctions.forEach(el => {
+		if (el) {
+			el.addEventListener('click', () => {
+				if (creditsModal) creditsModal.classList.remove('show');
+			});
+		}
+	});
+
 	const otherPresetsBtn = document.getElementById('other-presets-btn');
 	const presetsModal = document.getElementById('presets-modal');
 	const closeModal = document.getElementById('close-modal');

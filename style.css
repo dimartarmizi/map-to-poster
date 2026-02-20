@@ -117,11 +117,13 @@
 	transition: width 0.3s ease, height 0.3s ease, background-color 0.3s ease;
 }
 
-#presets-modal.show {
+#presets-modal.show,
+#credits-modal.show {
 	@apply opacity-100 pointer-events-auto;
 }
 
-#presets-modal.show > div:last-child {
+#presets-modal.show > div:last-child,
+#credits-modal.show > div:last-child {
 	@apply scale-100;
 }
 
