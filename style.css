@@ -126,12 +126,14 @@
 }
 
 #presets-modal.show,
-#credits-modal.show {
+#credits-modal.show,
+#artistic-modal.show {
 	@apply opacity-100 pointer-events-auto;
 }
 
 #presets-modal.show > div:last-child,
-#credits-modal.show > div:last-child {
+#credits-modal.show > div:last-child,
+#artistic-modal.show > div:last-child {
 	@apply scale-100;
 }
 

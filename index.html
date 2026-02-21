@@ -5,7 +5,7 @@
 	<meta charset="UTF-8" />
 	<link rel="icon" type="image/x-icon" href="/favicon.ico" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>MapToPoster JS — Create Beautiful Map Art</title>
+	<title>MapToPoster JS - Create Beautiful Map Art</title>
 
 	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 	<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
@@ -170,12 +170,7 @@
 					<div id="artistic-theme-config" class="space-y-4 hidden">
 						<div>
 							<span class="label-sm">Artistic Theme</span>
-							<div class="relative">
-								<select id="artistic-theme-select" class="input-field appearance-none cursor-pointer">
-								</select>
-								<svg class="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-								</svg>
+							<div id="artistic-main-grid" class="grid grid-cols-2 gap-3 mt-2">
 							</div>
 						</div>
 						<p id="artistic-desc" class="text-[10px] text-slate-400 italic px-1"></p>
@@ -606,6 +601,30 @@
 
 			<div class="p-6 bg-slate-50 border-t border-slate-100 flex justify-center">
 				<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Made with ❤️ in Indonesia</p>
+			</div>
+		</div>
+	</div>
+
+	<div id="artistic-modal" class="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300">
+		<div id="artistic-modal-overlay" class="absolute inset-0 bg-slate-900/60 backdrop-blur-md"></div>
+		<div class="relative w-[90%] max-w-2xl max-h-[85vh] bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col scale-95 transition-transform duration-300">
+			<div class="p-8 border-b border-slate-100 flex items-center justify-between">
+				<div>
+					<h2 class="text-2xl font-bold text-slate-900">More Artistic Themes</h2>
+					<p class="text-xs text-slate-400 font-medium uppercase tracking-wider mt-1">Choose from more palettes</p>
+				</div>
+				<button id="close-artistic-modal" class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-100 transition-colors">
+					<svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+
+			<div id="artistic-modal-content" class="flex-1 overflow-y-auto p-8 space-y-4 no-scrollbar">
+			</div>
+
+			<div class="p-6 bg-slate-50 border-t border-slate-100 flex justify-end">
+				<button id="close-artistic-modal-btn" class="px-6 py-2.5 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-accent transition-colors">Done</button>
 			</div>
 		</div>
 	</div>

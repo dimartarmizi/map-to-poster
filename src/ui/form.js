@@ -34,17 +34,54 @@ export function setupControls() {
 	const labelsControl = document.getElementById('labels-control');
 
 	const themeSelect = document.getElementById('theme-select');
-	const artisticThemeSelect = document.getElementById('artistic-theme-select');
+	const artisticMainGrid = document.getElementById('artistic-main-grid');
 	const artisticDesc = document.getElementById('artistic-desc');
 
-	if (artisticThemeSelect) {
-		artisticThemeSelect.innerHTML = Object.keys(artisticThemes)
-			.sort((a, b) => (artisticThemes[a].name || a).localeCompare(artisticThemes[b].name || b))
-			.map(key => {
-				const t = artisticThemes[key];
-				return `<option value="${key}">${t.name || key}</option>`;
-			})
-			.join('\n');
+	const paletteFor = (t) => {
+		const candidates = [t.road_motorway, t.road_primary, t.road_secondary, t.road_tertiary, t.text, t.bg];
+		return candidates.map(c => c || '#cccccc').slice(0, 4);
+	};
+
+	if (artisticMainGrid) {
+		const mainKeys = ['cyber_noir', 'golden_era', 'mangrove_maze'];
+
+		const makeCard = (key, theme, isOther = false) => {
+			const p = paletteFor(theme);
+			const label = theme && theme.name ? theme.name : (isOther ? 'Other Theme' : key);
+			return `
+				<button type="button" data-key="${key}" class="art-card group p-3 rounded-2xl border border-slate-100 bg-slate-50 flex flex-col items-center text-center hover:shadow-xl transition-all">
+					<div class="flex items-center justify-center -space-x-2">
+						<span class="w-6 h-6 rounded-full ring-1 ring-white" style="background:${p[0]}"></span>
+						<span class="w-6 h-6 rounded-full ring-1 ring-white" style="background:${p[1]}"></span>
+						<span class="w-6 h-6 rounded-full ring-1 ring-white" style="background:${p[2]}"></span>
+						<span class="w-6 h-6 rounded-full ring-1 ring-white" style="background:${p[3]}"></span>
+					</div>
+					<div class="mt-3 text-[11px] font-semibold text-slate-900">${label}</div>
+				</button>
+			`;
+		};
+
+		const mainHtml = mainKeys.map(k => makeCard(k, artisticThemes[k] || {})).join('') + makeCard('other', { name: 'Other Theme' }, true);
+		artisticMainGrid.innerHTML = mainHtml;
+
+		artisticMainGrid.querySelectorAll('.art-card').forEach(btn => {
+			btn.addEventListener('click', (e) => {
+				const k = btn.dataset.key;
+				if (k === 'other') {
+					const artModal = document.getElementById('artistic-modal');
+					if (artModal) {
+						artModal.classList.add('show');
+						populateArtisticModal();
+					}
+					return;
+				}
+				updateState({ artisticTheme: k });
+				if (state.renderMode === 'artistic') {
+					const theme = getSelectedArtisticTheme();
+					updateArtisticStyle(theme);
+				}
+			});
+		});
 	}
 
 	if (themeSelect) {
@@ -171,6 +208,54 @@ export function setupControls() {
 			});
 		}
 	});
+
+	const artisticModal = document.getElementById('artistic-modal');
+	const artisticModalContent = document.getElementById('artistic-modal-content');
+	const closeArtisticModal = document.getElementById('close-artistic-modal');
+	const closeArtisticModalBtn = document.getElementById('close-artistic-modal-btn');
+	const artisticModalOverlay = document.getElementById('artistic-modal-overlay');
+
+	const closeArtisticFuncs = [closeArtisticModal, closeArtisticModalBtn, artisticModalOverlay];
+	closeArtisticFuncs.forEach(el => {
+		if (el) el.addEventListener('click', () => { if (artisticModal) artisticModal.classList.remove('show'); });
+	});
+
+	function populateArtisticModal() {
+		if (!artisticModalContent) return;
+		const mainKeys = new Set(['cyber_noir', 'golden_era', 'mangrove_maze']);
+		artisticModalContent.innerHTML = Object.entries(artisticThemes)
+			.filter(([k]) => !mainKeys.has(k))
+			.map(([key, t]) => {
+				const candidates = [t.road_motorway, t.road_primary, t.road_secondary, t.road_tertiary, t.text, t.bg];
+				const p = candidates.map(c => c || '#cccccc').slice(0, 4);
+				return `
+					<button class="artistic-modal-item group w-full flex items-center p-4 border border-slate-100 rounded-2xl hover:shadow-xl transition-all" data-key="${key}">
+						<div class="flex -space-x-2 mr-4">
+							<span class="w-6 h-6 rounded-full ring-1 ring-white" style="background:${p[0]}"></span>
+							<span class="w-6 h-6 rounded-full ring-1 ring-white" style="background:${p[1]}"></span>
+							<span class="w-6 h-6 rounded-full ring-1 ring-white" style="background:${p[2]}"></span>
+							<span class="w-6 h-6 rounded-full ring-1 ring-white" style="background:${p[3]}"></span>
+						</div>
+						<div class="text-left">
+							<div class="text-sm font-semibold text-slate-900">${t.name || key}</div>
+							<div class="text-[10px] text-slate-400 mt-1">${t.description || ''}</div>
+						</div>
+					</button>
+				`;
+			}).join('\n');
+
+		artisticModalContent.querySelectorAll('.artistic-modal-item').forEach(btn => {
+			btn.addEventListener('click', () => {
+				const k = btn.dataset.key;
+				updateState({ artisticTheme: k });
+				if (state.renderMode === 'artistic') {
+					const theme = getSelectedArtisticTheme();
+					updateArtisticStyle(theme);
+				}
+				if (artisticModal) artisticModal.classList.remove('show');
+			});
+		});
+	}
 
 	function populateModal() {
 		if (!modalContent) return;
@@ -408,13 +493,6 @@ export function setupControls() {
 		themeSelect.addEventListener('input', onThemeInput);
 	}
 
-	artisticThemeSelect.addEventListener('change', (e) => {
-		updateState({ artisticTheme: e.target.value });
-		if (state.renderMode === 'artistic') {
-			const theme = getSelectedArtisticTheme();
-			updateArtisticStyle(theme);
-		}
-	});
 
 	if (labelsToggle) {
 		labelsToggle.addEventListener('change', (e) => {
@@ -629,7 +707,32 @@ export function setupControls() {
 		}
 
 		themeSelect.value = currentState.theme;
-		artisticThemeSelect.value = currentState.artisticTheme;
+		if (artisticMainGrid) {
+			const mainKeys = new Set(['cyber_noir', 'golden_era', 'mangrove_maze']);
+			const selectedKey = currentState.artisticTheme;
+			artisticMainGrid.querySelectorAll('.art-card').forEach(btn => {
+				const k = btn.dataset.key;
+				let active = false;
+				if (k === 'other') {
+					active = !!(selectedKey && !mainKeys.has(selectedKey));
+				} else {
+					active = k === selectedKey;
+				}
+				btn.classList.toggle('border-accent', active);
+				btn.classList.toggle('bg-accent-light', active);
+				if (active) btn.classList.add('ring-accent'); else btn.classList.remove('ring-accent');
+
+				if (k === 'other') {
+					const spans = btn.querySelectorAll('span.w-6.h-6');
+					if (selectedKey && artisticThemes[selectedKey] && !mainKeys.has(selectedKey)) {
+						const p = paletteFor(artisticThemes[selectedKey]);
+						spans.forEach((s, i) => { s.style.background = p[i] || '#cccccc'; });
+					} else {
+						spans.forEach((s) => { s.style.background = '#cccccc'; });
+					}
+				}
+			});
+		}
 
 		const artisticTheme = getSelectedArtisticTheme();
 		artisticDesc.textContent = artisticTheme.description;
