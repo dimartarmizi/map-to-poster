@@ -132,7 +132,6 @@
 						</div>
 					</div>
 				</div>
-				<p class="text-[9px] text-slate-400 italic text-center pt-1">Tip: Drag the label to reposition it freely.</p>
 			</div>
 
 			<div class="space-y-4">
@@ -201,6 +200,14 @@
 
 					<div id="overlay-controls" class="mt-4 space-y-4">
 						<div>
+							<span class="label-sm">Overlay Effect</span>
+							<div id="overlay-bg-group" class="grid grid-cols-2 gap-2 w-full mt-1">
+								<button type="button" data-bg="none" class="overlay-bg-btn px-3 py-2 text-[10px] font-bold rounded-lg bg-slate-50 border border-slate-100">None</button>
+								<button type="button" data-bg="vignette" class="overlay-bg-btn px-3 py-2 text-[10px] font-bold rounded-lg bg-slate-50 border border-slate-100">Vignette</button>
+							</div>
+						</div>
+
+						<div>
 							<span class="label-sm">Overlay Size</span>
 							<div id="overlay-size-group" class="grid grid-cols-4 gap-2 w-full mt-1">
 								<button type="button" data-size="none" class="overlay-size-btn px-3 py-2 text-[10px] font-bold rounded-lg bg-slate-50 border border-slate-100">None</button>
@@ -210,58 +217,52 @@
 							</div>
 						</div>
 
-					<div>
-						<span class="label-sm">Background Style</span>
-					<div id="overlay-bg-group" class="grid grid-cols-2 gap-2 w-full mt-1">
-						<button type="button" data-bg="none" class="overlay-bg-btn px-3 py-2 text-[10px] font-bold rounded-lg bg-slate-50 border border-slate-100">None</button>
-						<button type="button" data-bg="vignette" class="overlay-bg-btn px-3 py-2 text-[10px] font-bold rounded-lg bg-slate-50 border border-slate-100">Vignette</button>
-					</div>
-					</div>
-
-					<div>
-						<div class="flex items-center justify-between mb-2">
-							<span class="label-sm mb-0">Label Position</span>
-							<button id="reset-overlay-pos-btn" title="Reset to default position" class="flex items-center space-x-1 px-2 py-1 text-[9px] font-bold text-slate-400 hover:text-accent hover:bg-accent-light rounded-lg transition-all">
-								<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-								<span>Reset</span>
-							</button>
+						<div id="overlay-position-group">
+							<div class="flex items-center justify-between">
+								<span class="label-sm mb-0">Overlay Position</span>
+								<button id="reset-overlay-pos-btn" title="Reset to default position" class="flex items-center space-x-1 px-2 py-1 text-[9px] font-bold text-slate-400 hover:text-accent hover:bg-accent-light rounded-lg transition-all">
+									<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+									</svg>
+									<span>Reset</span>
+								</button>
+							</div>
+							<div class="space-y-4 mt-1">
+								<div class="grid grid-cols-3 gap-1.5">
+									<button class="overlay-pos-btn relative aspect-square rounded-lg border border-slate-100 bg-slate-50 hover:border-accent hover:bg-white transition-all" data-overlay-x="0.15" data-overlay-y="0.15" title="Top Left">
+										<span class="pos-dot absolute top-1.5 left-1.5 w-2 h-2 rounded-full bg-slate-300 transition-colors"></span>
+									</button>
+									<button class="overlay-pos-btn relative aspect-square rounded-lg border border-slate-100 bg-slate-50 hover:border-accent hover:bg-white transition-all" data-overlay-x="0.5" data-overlay-y="0.15" title="Top Center">
+										<span class="pos-dot absolute top-1.5 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-slate-300 transition-colors"></span>
+									</button>
+									<button class="overlay-pos-btn relative aspect-square rounded-lg border border-slate-100 bg-slate-50 hover:border-accent hover:bg-white transition-all" data-overlay-x="0.85" data-overlay-y="0.15" title="Top Right">
+										<span class="pos-dot absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-slate-300 transition-colors"></span>
+									</button>
+									<button class="overlay-pos-btn relative aspect-square rounded-lg border border-slate-100 bg-slate-50 hover:border-accent hover:bg-white transition-all" data-overlay-x="0.15" data-overlay-y="0.5" title="Middle Left">
+										<span class="pos-dot absolute top-1/2 left-1.5 -translate-y-1/2 w-2 h-2 rounded-full bg-slate-300 transition-colors"></span>
+									</button>
+									<button class="overlay-pos-btn relative aspect-square rounded-lg border border-slate-100 bg-slate-50 hover:border-accent hover:bg-white transition-all" data-overlay-x="0.5" data-overlay-y="0.5" title="Center">
+										<span class="pos-dot absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-slate-300 transition-colors"></span>
+									</button>
+									<button class="overlay-pos-btn relative aspect-square rounded-lg border border-slate-100 bg-slate-50 hover:border-accent hover:bg-white transition-all" data-overlay-x="0.85" data-overlay-y="0.5" title="Middle Right">
+										<span class="pos-dot absolute top-1/2 right-1.5 -translate-y-1/2 w-2 h-2 rounded-full bg-slate-300 transition-colors"></span>
+									</button>
+									<button class="overlay-pos-btn relative aspect-square rounded-lg border border-slate-100 bg-slate-50 hover:border-accent hover:bg-white transition-all" data-overlay-x="0.15" data-overlay-y="0.85" title="Bottom Left">
+										<span class="pos-dot absolute bottom-1.5 left-1.5 w-2 h-2 rounded-full bg-slate-300 transition-colors"></span>
+									</button>
+									<button class="overlay-pos-btn relative aspect-square rounded-lg border border-slate-100 bg-slate-50 hover:border-accent hover:bg-white transition-all" data-overlay-x="0.5" data-overlay-y="0.85" title="Bottom Center">
+										<span class="pos-dot absolute bottom-1.5 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-slate-300 transition-colors"></span>
+									</button>
+									<button class="overlay-pos-btn relative aspect-square rounded-lg border border-slate-100 bg-slate-50 hover:border-accent hover:bg-white transition-all" data-overlay-x="0.85" data-overlay-y="0.85" title="Bottom Right">
+										<span class="pos-dot absolute bottom-1.5 right-1.5 w-2 h-2 rounded-full bg-slate-300 transition-colors"></span>
+									</button>
+								</div>
+								<p class="text-[9px] text-slate-400 italic text-center">Tip: Drag the map to reposition it freely.</p>
+							</div>
 						</div>
-						<div class="grid grid-cols-3 gap-1.5">
-							<!-- Top row -->
-							<button class="overlay-pos-btn relative aspect-square rounded-lg border border-slate-100 bg-slate-50 hover:border-accent hover:bg-white transition-all" data-overlay-x="0.15" data-overlay-y="0.15" title="Top Left">
-								<span class="pos-dot absolute top-1.5 left-1.5 w-2 h-2 rounded-full bg-slate-300 transition-colors"></span>
-							</button>
-							<button class="overlay-pos-btn relative aspect-square rounded-lg border border-slate-100 bg-slate-50 hover:border-accent hover:bg-white transition-all" data-overlay-x="0.5" data-overlay-y="0.15" title="Top Center">
-								<span class="pos-dot absolute top-1.5 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-slate-300 transition-colors"></span>
-							</button>
-							<button class="overlay-pos-btn relative aspect-square rounded-lg border border-slate-100 bg-slate-50 hover:border-accent hover:bg-white transition-all" data-overlay-x="0.85" data-overlay-y="0.15" title="Top Right">
-								<span class="pos-dot absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-slate-300 transition-colors"></span>
-							</button>
-							<!-- Middle row -->
-							<button class="overlay-pos-btn relative aspect-square rounded-lg border border-slate-100 bg-slate-50 hover:border-accent hover:bg-white transition-all" data-overlay-x="0.15" data-overlay-y="0.5" title="Middle Left">
-								<span class="pos-dot absolute top-1/2 left-1.5 -translate-y-1/2 w-2 h-2 rounded-full bg-slate-300 transition-colors"></span>
-							</button>
-							<button class="overlay-pos-btn relative aspect-square rounded-lg border border-slate-100 bg-slate-50 hover:border-accent hover:bg-white transition-all" data-overlay-x="0.5" data-overlay-y="0.5" title="Center">
-								<span class="pos-dot absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-slate-300 transition-colors"></span>
-							</button>
-							<button class="overlay-pos-btn relative aspect-square rounded-lg border border-slate-100 bg-slate-50 hover:border-accent hover:bg-white transition-all" data-overlay-x="0.85" data-overlay-y="0.5" title="Middle Right">
-								<span class="pos-dot absolute top-1/2 right-1.5 -translate-y-1/2 w-2 h-2 rounded-full bg-slate-300 transition-colors"></span>
-							</button>
-							<!-- Bottom row -->
-							<button class="overlay-pos-btn relative aspect-square rounded-lg border border-slate-100 bg-slate-50 hover:border-accent hover:bg-white transition-all" data-overlay-x="0.15" data-overlay-y="0.85" title="Bottom Left">
-								<span class="pos-dot absolute bottom-1.5 left-1.5 w-2 h-2 rounded-full bg-slate-300 transition-colors"></span>
-							</button>
-							<button class="overlay-pos-btn relative aspect-square rounded-lg border border-slate-100 bg-slate-50 hover:border-accent hover:bg-white transition-all" data-overlay-x="0.5" data-overlay-y="0.85" title="Bottom Center">
-								<span class="pos-dot absolute bottom-1.5 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-slate-300 transition-colors"></span>
-							</button>
-							<button class="overlay-pos-btn relative aspect-square rounded-lg border border-slate-100 bg-slate-50 hover:border-accent hover:bg-white transition-all" data-overlay-x="0.85" data-overlay-y="0.85" title="Bottom Right">
-								<span class="pos-dot absolute bottom-1.5 right-1.5 w-2 h-2 rounded-full bg-slate-300 transition-colors"></span>
-							</button>
-						</div>
-					</div>
 
-					<div class="flex items-center justify-between pt-2 border-slate-50">
-						<span class="label-sm mb-0">Show Location Marker</span>
+						<div class="flex items-center justify-between pt-2 border-slate-50">
+							<span class="label-sm mb-0">Show Location Marker</span>
 							<label class="relative inline-flex items-center cursor-pointer">
 								<input type="checkbox" id="show-marker-toggle" class="sr-only peer">
 								<div class="toggle-pill"></div>
@@ -293,12 +294,11 @@
 									<input type="range" id="marker-size-slider" min="10" max="120" step="2" value="40" class="w-full h-1 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-accent" />
 								</div>
 							</div>
-					<p class="text-[9px] text-slate-400 italic text-center">Tip: You can drag the marker on the map to reposition it.</p>
+							<p class="text-[9px] text-slate-400 italic text-center">Tip: You can drag the marker on the map to reposition it.</p>
+						</div>
 					</div>
 				</div>
-				<p class="text-[9px] text-slate-400 italic text-center pt-1">Tip: Drag the map to reposition it freely.</p>
 			</div>
-		</div>
 
 			<div class="space-y-4">
 				<div class="flex items-center justify-between">

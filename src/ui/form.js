@@ -444,19 +444,7 @@ export function setupControls() {
 		overlaySizeButtons.forEach(btn => {
 			btn.addEventListener('click', (e) => {
 				const size = btn.dataset.size;
-				if (size === 'none') {
-					updateState({ overlaySize: size, overlayBgType: 'none' });
-					overlayBgButtons.forEach(b => {
-						b.disabled = true;
-						b.classList.add('opacity-50', 'pointer-events-none');
-					});
-				} else {
-					updateState({ overlaySize: size });
-					overlayBgButtons.forEach(b => {
-						b.disabled = false;
-						b.classList.remove('opacity-50', 'pointer-events-none');
-					});
-				}
+				updateState({ overlaySize: size });
 			});
 		});
 	}
@@ -491,6 +479,7 @@ export function setupControls() {
 	}
 
 	const overlayPosBtns = document.querySelectorAll('.overlay-pos-btn');
+	const overlayPositionGroup = document.getElementById('overlay-position-group');
 	overlayPosBtns.forEach(btn => {
 		btn.addEventListener('click', () => {
 			const x = parseFloat(btn.dataset.overlayX);
@@ -599,6 +588,10 @@ export function setupControls() {
 		const overlayPosBtnsSync = document.querySelectorAll('.overlay-pos-btn');
 		const curX = currentState.overlayX !== undefined ? currentState.overlayX : 0.5;
 		const curY = currentState.overlayY !== undefined ? currentState.overlayY : 0.85;
+
+		if (overlayPositionGroup) {
+			overlayPositionGroup.classList.toggle('hidden', (currentState.overlaySize || 'medium') === 'none');
+		}
 		const TOLERANCE = 0.02;
 		overlayPosBtnsSync.forEach(btn => {
 			const bx = parseFloat(btn.dataset.overlayX);
@@ -645,13 +638,6 @@ export function setupControls() {
 		if (overlayBgButtons && overlayBgButtons.length) {
 			overlayBgButtons.forEach(b => {
 				const style = b.dataset.bg;
-				if (currentState.overlaySize === 'none') {
-					b.disabled = true;
-					b.classList.add('opacity-50', 'pointer-events-none');
-				} else {
-					b.disabled = false;
-					b.classList.remove('opacity-50', 'pointer-events-none');
-				}
 				if (style === (currentState.overlayBgType || 'vignette')) {
 					b.classList.add('bg-accent', 'text-white');
 					b.classList.remove('bg-slate-50');
@@ -882,10 +868,20 @@ export function updatePreviewStyles(currentState) {
 				overlayBg.style.backdropFilter = '';
 				overlayBg.style.webkitBackdropFilter = '';
 			}
+			const bgTypeNone = currentState.overlayBgType || 'vignette';
+			const colorNone = activeTheme.background || activeTheme.bg || activeTheme.overlayBg || '#ffffff';
 			if (vignetteOverlay) {
-				vignetteOverlay.style.display = 'none';
-				vignetteOverlay.style.opacity = '0';
-				vignetteOverlay.style.background = '';
+				if (bgTypeNone === 'vignette') {
+					vignetteOverlay.style.display = '';
+					vignetteOverlay.style.opacity = '1';
+					const colorSolid = hexToRgba(colorNone, 1);
+					const colorTrans = hexToRgba(colorNone, 0);
+					vignetteOverlay.style.background = `linear-gradient(to bottom, ${colorSolid} 0%, ${colorSolid} 3%, ${colorTrans} 20%, ${colorTrans} 80%, ${colorSolid} 97%, ${colorSolid} 100%)`;
+				} else {
+					vignetteOverlay.style.display = 'none';
+					vignetteOverlay.style.opacity = '0';
+					vignetteOverlay.style.background = '';
+				}
 			}
 		} else {
 			overlay.style.display = '';
@@ -922,7 +918,7 @@ export function updatePreviewStyles(currentState) {
 			overlay.style.left = `${overlayX * 100}%`;
 			overlay.style.top = `${overlayY * 100}%`;
 			{
-				const EDGE = 8; 
+				const EDGE = 8;
 				const cW = posterContainer.offsetWidth;
 				const cH = posterContainer.offsetHeight;
 				const oW = overlay.offsetWidth;
