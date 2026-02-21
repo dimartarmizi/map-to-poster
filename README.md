@@ -21,7 +21,7 @@ MapToPoster JS is a client-side web application designed to generate high-resolu
   - Customizable poster overlays (size, background style).
   - Geographic coordinate display with per-field visibility toggles.
 - **Draggable City Label**: Drag the location text overlay to any position on the poster canvas. Position presets (3 × 3 grid) and a reset button are also available for quick placement.
-- **Background Styles**: Choose between None, Vignette (linear gradient), and Radial vignette for the poster overlay background.
+- **Background Styles**: Choose between None & Vignette (linear gradient) for the poster overlay background.
 - **Show / Hide Label Fields**: Toggle the country name and coordinates independently on the poster canvas without removing them from the form.
 - **High-Resolution Export**: Export your creations as high-quality PNG files with preset sizes (A4, Instagram, Stories) or custom pixel dimensions.
 - **Persistent Settings**: Your preferences and last viewed location are automatically saved to local storage.
