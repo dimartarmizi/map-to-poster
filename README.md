@@ -1,35 +1,29 @@
 <p align="center">
-  <img src="public/logo.webp" alt="MapToPoster JS Logo" width="256">
+  <img src="public/logo.webp" alt="MapToPoster JS Logo" width="192">
 </p>
 
 # MapToPoster JS
 
 [![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML) [![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS) [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript) [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/) [![Leaflet](https://img.shields.io/badge/Leaflet-199903?style=for-the-badge&logo=Leaflet&logoColor=white)](https://leafletjs.com/) [![MapLibre](https://img.shields.io/badge/MapLibre-212121?style=for-the-badge&logo=maplibre&logoColor=white)](https://maplibre.org/) [![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 
-MapToPoster JS is a client-side web application designed to generate high-resolution map posters. It allows users to search for any location in the world and transform it into a piece of art with customizable themes, layouts, and export formats.
+
+MapToPoster JS is a professional-grade, client-side web application designed to help you generate a custom Map To Poster with ease. Whether you're looking to create minimalist city art or a vibrant geographic keepsake, this tool allows you to search for any location in the world and transform it into a stunning Map To Poster piece with fully customizable themes, layouts, and high-fidelity export options. As a versatile Map To Poster generator, the application focuses on high-resolution output suitable for large-format printing, making it the perfect tool for creating unique wall art or personalized gifts.
 
 ![MapToPoster JS Preview](public/screenshot.webp)
 
 ## 🚀 Key Features
 
-- **Dual Rendering Engine**: 
-  - **Standard Mode**: Efficient tile-based mapping powered by Leaflet, supporting various base map styles (Minimal, Dark, Satellite, Voyager).
-  - **Artistic Mode**: Vector-based procedural themes powered by MapLibre GL, offering unique styles like Arctic Frost, Aurora Glow, Cyber Glitch, and more.
-- **Global Search**: Find any city or landmark worldwide via Nominatim API.
-- **Custom Enhancements**:
-  - **Custom Markers**: Place and customize location pins with verschiedene icons and adjustable sizes.
-  - **Route Plotting**: Draw custom paths or travel routes directly on the map.
-  - **Mat / Passepartout**: Add a classic physical framing effect with customizable border width and opacity.
-- **Dynamic Composition**: 
-  - Real-time perspective and zoom controls.
-  - Customizable poster overlays (size, background style).
-  - Geographic coordinate display with per-field visibility toggles.
-- **Draggable City Label**: Drag the location text overlay to any position on the poster canvas. Position presets (3 × 3 grid) and a reset button are also available for quick placement.
-- **Background Styles**: Choose between None & Vignette (linear gradient) for the poster overlay background.
-- **Show / Hide Label Fields**: Toggle the country name and coordinates independently on the poster canvas without removing them from the form.
-- **High-Resolution Export**: Export your creations as high-quality PNG files with preset sizes (A4, Instagram, Stories) or custom pixel dimensions.
-- **Persistent Settings**: Your preferences and last viewed location are automatically saved to local storage.
-- **Privacy Focused**: All rendering and data processing happen entirely on the client-side.
+- **Hybrid Rendering System**: Seamlessly switch between efficient tile-based mapping (Leaflet) and procedural vector artistry (MapLibre GL).
+- **Precision Geocoding**: Instant global location search powered by the Nominatim API.
+- **Dynamic Markers**: Place, drag, and style multiple location indicators with various icons and adjustable sizes.
+- **Custom Travel Paths**: Visualize journeys or specific itineraries with integrated route plotting and dynamic path fetching.
+- **Mat / Passepartout Framing**: Apply a classic gallery-style framing effect with customizable width, border thickness, and opacity.
+- **Elegant Typography**: A curated selection of premium fonts with full support for custom text and coordinate overrides.
+- **Draggable UI Overlay**: A fluid city-label overlay with automatic edge-clamping and symmetric safety padding.
+- **Background Edge Effects**: Improve readability using soft vignette shading or subtle transparency along the edges.
+- **Layout Flexibility**: Independently toggle country names, geographic coordinates, and map labels for a tailored look.
+- **Pro-Grade Exports**: Generate high-fidelity PNG files at custom resolutions or ultra-high resolutions (up to 50,000px).
+- **Privacy & Performance**: Persistent settings via LocalStorage and 100% client-side rendering, your data never leaves your browser.
 
 ## 🎨 Themes
 
@@ -77,11 +71,12 @@ The application will automatically pick up the new theme and display it in the s
 ## 🛠️ Tech Stack
 
 - **Framework**: Vanilla JavaScript (ES Modules)
-- **Bundler**: [Vite](https://vitejs.dev/)
-- **Mapping**: [Leaflet](https://leafletjs.com/) & [MapLibre GL](https://maplibre.org/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Bundler**: [Vite 5](https://vitejs.dev/)
+- **Mapping**: [Leaflet](https://leafletjs.com/) (Raster) & [MapLibre GL](https://maplibre.org/) (Vector)
+- **Styling**: [Tailwind CSS 3](https://tailwindcss.com/)
 - **Rendering**: [html2canvas](https://html2canvas.hertzen.com/)
-- **Typography**: Outfit, Playfair Display, Cormorant Garamond (Google Fonts)
+- **Typography**: Google Fonts including Outfit, Playfair Display, and Cormorant Garamond
+- **API**: Nominatim (Search) & OSRM (Routing)
 
 ## 📦 Getting Started
 
@@ -119,12 +114,17 @@ Follow these steps to get a local copy up and running.
 
 ## 📜 Technical Overview
 
-1. **State Management**: A reactive state store in `src/core/state.js` synchronizes changes between the UI and both map engines. Overlay position (`overlayX`, `overlayY`), field visibility (`showCountry`, `showCoords`), and all other poster settings are persisted to `localStorage`.
-2. **Synchronized Viewports**: The Leaflet and MapLibre viewports are bidirectionally synced, ensuring consistency regardless of which interface is being manipulated.
-3. **Draggable Overlay**: The city-label overlay is positioned with CSS `left`/`top` percentages and `translate(-50%, -50%)`. During drag and on every style update, the overlay's rendered `offsetWidth`/`offsetHeight` are read and used to clamp its position so it never bleeds outside the poster edges — providing a symmetric 8 px minimum gap on all four sides regardless of city name length.
-4. **Capture Logic**: High-fidelity exports are achieved by scaling the map containers to the target resolution before rendering with `html2canvas` or internal GL buffers. The `onclone` callback replicates all live-preview styles — including overlay position clamping, vignette type, and field visibility — into the cloned document before capture.
+1. **Reactive State Management**: Uses an observer-pattern based store ([src/core/state.js](src/core/state.js)) to synchronize changes across the UI, Leaflet, and MapLibre engines. All user preferences are persisted via `localStorage`.
+2. **Hybrid Mapping Engine**: Implements bidirectional viewport synchronization between Leaflet (raster tiles) and MapLibre GL (vector themes), ensuring seamless layout consistency regardless of the active rendering mode.
+3. **Draggable Overlay System**: Leverages real-time bounding box calculations to clamp label positions, ensuring a symmetric 8px minimum safety gap from the poster edges.
+4. **Dynamic Asset Integration**: Manages custom GeoJSON routing and multi-marker instances with interactive drag-and-drop support across both map engines.
+5. **Mat Framing Layer**: Implements a virtual "Mat/Passepartout" interface with customizable inset spacing and inner borders for a gallery-style finish.
+6. **High-Fidelity Rendering Pipeline**: Captured exports utilize a multi-stage process in [src/core/export.js](src/core/export.js) to generate high-resolution map snapshots using `html2canvas` and the `onclone` callback.
 
-Inspired by [originalankur/maptoposter](https://github.com/originalankur/maptoposter). This project is an independent implementation built with a different stack and architecture.
+## 🤝 Credits
+
+- **Inspiration**: Inspired by [originalankur/maptoposter](https://github.com/originalankur/maptoposter). This project is an independent implementation built with a different stack and architecture.
+- **Contributors**: A huge thank you to all the contributors who have helped improve this project through their code, bug reports, and suggestions. Your support makes this tool better for everyone.
 
 ## 📧 Contact
 
