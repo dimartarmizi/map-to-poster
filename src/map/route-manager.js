@@ -50,7 +50,8 @@ export function updateRouteStyles(state) {
 
 	const isArtistic = state.renderMode === 'artistic';
 	const theme = isArtistic ? getSelectedArtisticTheme() : getSelectedTheme();
-	const color = isArtistic ? (theme.route || '#EF4444') : '#EF4444';
+	const color = theme.route || '#EF4444';
+	const casingColor = isArtistic ? (theme.bg || '#ffffff') : (theme.background || '#ffffff');
 
 	if (state.showRoute) {
 		const start = [state.routeStartLat, state.routeStartLon];
@@ -112,22 +113,22 @@ export function updateRouteStyles(state) {
 			: [start, ...via.map(p => [p.lat, p.lon]), end];
 
 		if (!routeLineCasing) {
-			routeLineCasing = L.polyline(routeCoords, { color: theme.bg || '#ffffff', weight: 14, opacity: 1.0, lineCap: 'round' }).addTo(map);
+			routeLineCasing = L.polyline(routeCoords, { color: casingColor, weight: 9, opacity: 1.0, lineCap: 'round' }).addTo(map);
 		} else {
-			if (!isSyncing) routeLineCasing.setLatLngs(routeCoords).setStyle({ color: theme.bg || '#ffffff' }).addTo(map);
+			if (!isSyncing) routeLineCasing.setLatLngs(routeCoords).setStyle({ color: casingColor, weight: 9 }).addTo(map);
 		}
 
 		if (!routeLine) {
 			routeLine = L.polyline(routeCoords, {
 				color: color,
-				weight: 24,
+				weight: 20,
 				opacity: 0,
 				interactive: true
 			}).addTo(map);
 
 			const visibleLine = L.polyline(routeCoords, {
 				color: color,
-				weight: 6,
+				weight: 4,
 				opacity: 1.0,
 				lineCap: 'round',
 				interactive: false
@@ -224,7 +225,7 @@ export function updateRouteStyles(state) {
 			if (!isSyncing) {
 				routeLine.setLatLngs(routeCoords).addTo(map);
 				if (routeLine._visibleLine) {
-					routeLine._visibleLine.setLatLngs(routeCoords).setStyle({ color: color }).addTo(map);
+					routeLine._visibleLine.setLatLngs(routeCoords).setStyle({ color: color, weight: 4 }).addTo(map);
 				}
 			}
 		}
@@ -281,6 +282,12 @@ export function updateRouteStyles(state) {
 				artisticViaMarkers = currentViaData.map((p, idx) => {
 					const el = document.createElement('div');
 					el.className = 'artistic-via-point';
+					el.style.width = '24px';
+					el.style.height = '24px';
+					el.style.display = 'flex';
+					el.style.alignItems = 'center';
+					el.style.justifyContent = 'center';
+					el.style.zIndex = '990';
 					el.innerHTML = `<div style="width: 12px; height: 12px; background: white; border: 2px solid #333; border-radius: 50%; box-shadow: 0 0 4px rgba(0,0,0,0.4); cursor: grab;"></div>`;
 
 					const am = new maplibregl.Marker({ element: el, draggable: true })
@@ -325,6 +332,12 @@ export function updateRouteStyles(state) {
 			if (!artisticRouteStartMarker) {
 				const el = document.createElement('div');
 				el.className = 'route-marker-a';
+				el.style.width = '24px';
+				el.style.height = '24px';
+				el.style.display = 'flex';
+				el.style.alignItems = 'center';
+				el.style.justifyContent = 'center';
+				el.style.zIndex = '1000';
 				el.innerHTML = routeMarkerHtml('A');
 				artisticRouteStartMarker = new maplibregl.Marker({ element: el, draggable: true }).setLngLat([start[1], start[0]]).addTo(artisticMap);
 				artisticRouteStartMarker.on('drag', () => {
@@ -343,6 +356,12 @@ export function updateRouteStyles(state) {
 			if (!artisticRouteEndMarker) {
 				const el = document.createElement('div');
 				el.className = 'route-marker-b';
+				el.style.width = '24px';
+				el.style.height = '24px';
+				el.style.display = 'flex';
+				el.style.alignItems = 'center';
+				el.style.justifyContent = 'center';
+				el.style.zIndex = '1000';
 				el.innerHTML = routeMarkerHtml('B');
 				artisticRouteEndMarker = new maplibregl.Marker({ element: el, draggable: true }).setLngLat([end[1], end[0]]).addTo(artisticMap);
 				artisticRouteEndMarker.on('drag', () => {

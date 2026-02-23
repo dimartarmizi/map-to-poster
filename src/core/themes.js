@@ -7,6 +7,7 @@ export const themes = {
 		textColor: "#000000",
 		accent: "#3b82f6",
 		overlayBg: "rgba(255, 255, 255, 0.8)",
+		route: "#EF4444",
 		description: "The classic OpenStreetMap look that everyone knows."
 	},
 	dark: {
@@ -17,6 +18,7 @@ export const themes = {
 		textColor: "#ffffff",
 		accent: "#818cf8",
 		overlayBg: "rgba(17, 17, 17, 0.85)",
+		route: "#F97316",
 		description: "Sleek and professional dark map for a premium feel."
 	},
 	minimal: {
@@ -27,6 +29,7 @@ export const themes = {
 		textColor: "#000000",
 		accent: "#6366f1",
 		overlayBg: "rgba(255, 255, 255, 0.8)",
+		route: "#3B82F6",
 		description: "Clean, elegant, and light. Perfect for modern spaces."
 	},
 	voyager: {
@@ -37,6 +40,7 @@ export const themes = {
 		textColor: "#1e293b",
 		accent: "#6366f1",
 		overlayBg: "rgba(255, 255, 255, 0.85)",
+		route: "#EF4444",
 		description: "Beautifully colored map with clear terrain and roads."
 	},
 	satellite: {
@@ -47,6 +51,7 @@ export const themes = {
 		textColor: "#ffffff",
 		accent: "#10b981",
 		overlayBg: "rgba(0, 0, 0, 0.6)",
+		route: "#EAB308",
 		description: "High-resolution satellite imagery from above."
 	}
 };

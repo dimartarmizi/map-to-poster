@@ -37,9 +37,16 @@ async function captureMapSnapshot() {
 			try {
 				const originalWidth = artisticContainer.style.width;
 				const originalHeight = artisticContainer.style.height;
+				const originalWidthPx = artisticContainer.offsetWidth;
 
 				artisticContainer.style.width = `${effectiveWidth}px`;
 				artisticContainer.style.height = `${effectiveHeight}px`;
+
+				const routeLayers = ['route-line', 'route-line-casing', 'route-line-glow'];
+				routeLayers.forEach(l => {
+					if (artisticMap.getLayer(l)) artisticMap.setLayoutProperty(l, 'visibility', 'none');
+				});
+
 				artisticMap.resize();
 
 				await new Promise(resolve => {
@@ -53,6 +60,8 @@ async function captureMapSnapshot() {
 				const mapCanvas = artisticMap.getCanvas();
 				ctx.drawImage(mapCanvas, 0, 0, canvas.width, canvas.height);
 
+				const scaleFactor = effectiveWidth / (originalWidthPx || 500);
+
 				if (state.showMarker && state.markers && state.markers.length > 0) {
 					const zoom = artisticMap.getZoom();
 					const center = artisticMap.getCenter();
@@ -60,7 +69,7 @@ async function captureMapSnapshot() {
 					const centerPoint = project(center.lat, center.lng, scale);
 
 					const theme = getSelectedArtisticTheme();
-					const color = theme.road_primary || theme.text || '#0f172a';
+					const color = theme.route || '#EF4444';
 
 					for (const markerData of state.markers) {
 						const markerPoint = project(markerData.lat, markerData.lon, scale);
@@ -92,10 +101,14 @@ async function captureMapSnapshot() {
 						};
 					});
 
-					drawComplexRouteToCtx(ctx, points, color, themeBg);
+					drawComplexRouteToCtx(ctx, points, color, themeBg, scaleFactor);
 				}
 
 				const data = canvas.toDataURL('image/png');
+
+				routeLayers.forEach(l => {
+					if (artisticMap.getLayer(l)) artisticMap.setLayoutProperty(l, 'visibility', 'visible');
+				});
 
 				artisticContainer.style.width = originalWidth;
 				artisticContainer.style.height = originalHeight;
@@ -135,7 +148,7 @@ async function captureMapSnapshot() {
 				const centerPoint = project(center.lat, center.lng, scaleMap);
 
 				const theme = getSelectedTheme();
-				const color = theme.text || theme.textColor || '#0f172a';
+				const color = theme.route || '#EF4444';
 
 				for (const markerData of state.markers) {
 					const markerPoint = project(markerData.lat, markerData.lon, scaleMap);
@@ -153,7 +166,8 @@ async function captureMapSnapshot() {
 				const centerPoint = project(center.lat, center.lng, scaleMap);
 
 				const theme = getSelectedTheme();
-				const themeBg = theme.bg || theme.backgroundColor || '#ffffff';
+				const themeBg = theme.background || '#ffffff';
+				const routeColor = theme.route || '#EF4444';
 
 				const via = state.routeViaPoints || [];
 				const geometry = (state.routeGeometry && state.routeGeometry.length > 0)
@@ -168,7 +182,7 @@ async function captureMapSnapshot() {
 					};
 				});
 
-				drawComplexRouteToCtx(ctx, points, '#EF4444', themeBg);
+				drawComplexRouteToCtx(ctx, points, routeColor, themeBg, scaleFactor);
 			}
 
 			return canvas.toDataURL('image/png');
@@ -179,8 +193,11 @@ async function captureMapSnapshot() {
 	return null;
 }
 
-function drawComplexRouteToCtx(ctx, points, color, themeBg = '#ffffff') {
+function drawComplexRouteToCtx(ctx, points, color, themeBg = '#ffffff', scaleFactor = 1) {
 	if (!points || points.length < 2) return;
+
+	const mainWidth = 4 * scaleFactor;
+	const casingWidth = 9 * scaleFactor;
 
 	ctx.beginPath();
 	ctx.moveTo(points[0].x, points[0].y);
@@ -188,19 +205,10 @@ function drawComplexRouteToCtx(ctx, points, color, themeBg = '#ffffff') {
 		ctx.lineTo(points[i].x, points[i].y);
 	}
 	ctx.strokeStyle = themeBg;
-	ctx.lineWidth = 20;
+	ctx.lineWidth = casingWidth;
 	ctx.lineCap = 'round';
 	ctx.lineJoin = 'round';
 	ctx.stroke();
-
-	ctx.save();
-	ctx.shadowBlur = 15;
-	ctx.shadowColor = color;
-	ctx.strokeStyle = color;
-	ctx.lineWidth = 12;
-	ctx.globalAlpha = 0.4;
-	ctx.stroke();
-	ctx.restore();
 
 	ctx.beginPath();
 	ctx.moveTo(points[0].x, points[0].y);
@@ -208,31 +216,29 @@ function drawComplexRouteToCtx(ctx, points, color, themeBg = '#ffffff') {
 		ctx.lineTo(points[i].x, points[i].y);
 	}
 	ctx.strokeStyle = color;
-	ctx.lineWidth = 8;
+	ctx.lineWidth = mainWidth;
 	ctx.lineCap = 'round';
 	ctx.lineJoin = 'round';
-	ctx.globalAlpha = 1.0;
 	ctx.stroke();
 
 	const drawPoint = (x, y, label) => {
+		const dotSize = 12 * scaleFactor;
 		ctx.beginPath();
-		ctx.arc(x, y, 14, 0, Math.PI * 2);
+		ctx.arc(x, y, dotSize, 0, Math.PI * 2);
 		ctx.fillStyle = '#ffffff';
-		ctx.shadowColor = 'rgba(0,0,0,0.3)';
-		ctx.shadowBlur = 10;
 		ctx.fill();
-		ctx.shadowBlur = 0;
-
 		ctx.strokeStyle = '#0f172a';
-		ctx.lineWidth = 2;
+		ctx.lineWidth = 1.5 * scaleFactor;
 		ctx.stroke();
 
 		ctx.fillStyle = '#0f172a';
-		ctx.font = 'black 12px sans-serif';
+		ctx.font = `bold ${10 * scaleFactor}px sans-serif`;
 		ctx.textAlign = 'center';
 		ctx.textBaseline = 'middle';
 		ctx.fillText(label, x, y);
 	};
+	drawPoint(points[0].x, points[0].y, 'A');
+	drawPoint(points[points.length - 1].x, points[points.length - 1].y, 'B');
 
 	drawPoint(points[0].x, points[0].y, 'A');
 	drawPoint(points[points.length - 1].x, points[points.length - 1].y, 'B');

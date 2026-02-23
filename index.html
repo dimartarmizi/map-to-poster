@@ -128,7 +128,7 @@
 						</label>
 					</div>
 
-					<div id="marker-settings" class="space-y-4 hidden pt-2">
+					<div id="marker-settings" class="space-y-4 hidden">
 						<div class="grid grid-cols-2 gap-3">
 							<div>
 								<span class="label-sm">Marker Symbol</span>
@@ -181,7 +181,7 @@
 						<p class="text-[9px] text-slate-400 italic text-center">Tip: You can drag the marker on the map to reposition it.</p>
 					</div>
 
-					<div class="flex items-center justify-between pt-4 border-t border-slate-50">
+					<div class="flex items-center justify-between">
 						<span class="label-sm mb-0">Custom Route (A to B)</span>
 						<label class="relative inline-flex items-center cursor-pointer">
 							<input type="checkbox" id="show-route-toggle" class="sr-only peer">
@@ -190,12 +190,15 @@
 					</div>
 
 					<div id="route-settings" class="space-y-4 hidden">
-						<button id="reset-route-btn" class="w-full py-2.5 px-4 rounded-xl border border-slate-100 bg-slate-50 text-[10px] font-bold uppercase tracking-wider text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-all flex items-center justify-center space-x-2">
-							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-							</svg>
-							<span>Reset Route Points</span>
-						</button>
+						<div class="bg-slate-50/50 rounded-2xl border border-slate-100 p-2 space-y-2">
+							<div class="flex items-center justify-between px-1.5 py-1">
+								<div class="flex items-center space-x-2">
+									<div class="w-1.5 h-1.5 bg-red-400 rounded-full animate-pulse"></div>
+									<span class="text-[10px] text-slate-500 font-medium uppercase tracking-wider"><span id="route-count" class="font-bold text-slate-900">2</span> Points Active</span>
+								</div>
+								<button id="reset-route-btn" class="text-[9px] font-bold text-slate-400 hover:text-red-500 transition-colors uppercase tracking-tight">Reset All</button>
+							</div>
+						</div>
 						<p class="text-[9px] text-slate-400 italic text-center">Tip: Drag the markers on the map to set the route. Click on the line to add a custom bend. Double click a point to remove it.</p>
 					</div>
 				</div>

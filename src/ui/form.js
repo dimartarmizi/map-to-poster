@@ -408,23 +408,28 @@ export function setupControls() {
 		const name = item.dataset.name;
 		const country = item.dataset.country;
 
-		const newMarkers = [...(state.markers || [])];
-		if (newMarkers.length > 0) {
-			newMarkers[0] = { lat, lon };
-		} else {
-			newMarkers.push({ lat, lon });
-		}
-
 		updateState({
 			city: (name || '').toUpperCase(),
 			country: (country || '').toUpperCase(),
 			lat,
 			lon,
-			markers: newMarkers
+			markers: [{ lat, lon }],
+			routeStartLat: lat,
+			routeStartLon: lon,
+			routeEndLat: lat - 0.005,
+			routeEndLon: lon + 0.005,
+			routeViaPoints: [],
+			routeGeometry: []
 		});
 
 		updateMapPosition(lat, lon);
 		updateMarkerStyles(state);
+
+		if (state.showRoute) {
+			updateRouteGeometry().then(() => {
+				updateRouteStyles(state);
+			});
+		}
 
 		searchInput.value = name;
 		searchResults.classList.add('hidden');
@@ -559,6 +564,7 @@ export function setupControls() {
 			if (t && t.tileUrl) updateMapTheme(t.tileUrl);
 			invalidateMapSize();
 			updateRouteStyles(state);
+			updateMarkerStyles(state);
 		}
 	}
 
@@ -910,6 +916,12 @@ export function setupControls() {
 			routeToggle.checked = !!currentState.showRoute;
 			const settings = document.getElementById('route-settings');
 			if (settings) settings.classList.toggle('hidden', !currentState.showRoute);
+		}
+
+		const routeCountDisplay = document.getElementById('route-count');
+		if (routeCountDisplay) {
+			const viaPoints = (currentState.routeViaPoints || []).length;
+			routeCountDisplay.textContent = 2 + viaPoints;
 		}
 
 		if (overlayBgButtons && overlayBgButtons.length) {

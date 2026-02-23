@@ -104,22 +104,6 @@ export function generateMapLibreStyle(theme) {
 				}
 			},
 			{
-				id: 'route-line-glow',
-				source: 'route-source',
-				type: 'line',
-				layout: {
-					'line-cap': 'round',
-					'line-join': 'round',
-					'visibility': state.showRoute ? 'visible' : 'none'
-				},
-				paint: {
-					'line-color': theme.route || '#EF4444',
-					'line-width': 12,
-					'line-blur': 4,
-					'line-opacity': 0.6
-				}
-			},
-			{
 				id: 'route-line',
 				source: 'route-source',
 				type: 'line',
@@ -130,7 +114,7 @@ export function generateMapLibreStyle(theme) {
 				},
 				paint: {
 					'line-color': theme.route || '#EF4444',
-					'line-width': 5
+					'line-width': 4
 				}
 			}
 		]

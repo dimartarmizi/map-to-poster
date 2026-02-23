@@ -40,7 +40,7 @@ export function updateMarkerStyles(currentState) {
 
 	const isArtistic = currentState.renderMode === 'artistic';
 	const theme = isArtistic ? getSelectedArtisticTheme() : getSelectedTheme();
-	const color = isArtistic ? (theme.road_primary || theme.text || '#0f172a') : (theme.textColor || '#0f172a');
+	const color = theme.route || (isArtistic ? (theme.text || '#0f172a') : (theme.textColor || '#0f172a'));
 
 	const html = (markerIcons[iconType] || markerIcons.pin)
 		.replace('class="marker-pin"', `style="width: ${size}px; height: ${size}px; color: ${color};"`);
