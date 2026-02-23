@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/logo.webp" alt="MapToPoster JS Logo" width="200">
+  <img src="public/logo.webp" alt="MapToPoster JS Logo" width="256">
 </p>
 
 # MapToPoster JS
@@ -16,6 +16,10 @@ MapToPoster JS is a client-side web application designed to generate high-resolu
   - **Standard Mode**: Efficient tile-based mapping powered by Leaflet, supporting various base map styles (Minimal, Dark, Satellite, Voyager).
   - **Artistic Mode**: Vector-based procedural themes powered by MapLibre GL, offering unique styles like Arctic Frost, Aurora Glow, Cyber Glitch, and more.
 - **Global Search**: Find any city or landmark worldwide via Nominatim API.
+- **Custom Enhancements**:
+  - **Custom Markers**: Place and customize location pins with verschiedene icons and adjustable sizes.
+  - **Route Plotting**: Draw custom paths or travel routes directly on the map.
+  - **Mat / Passepartout**: Add a classic physical framing effect with customizable border width and opacity.
 - **Dynamic Composition**: 
   - Real-time perspective and zoom controls.
   - Customizable poster overlays (size, background style).
@@ -47,20 +51,7 @@ Hand-crafted vector styles with procedural colors:
 - **Paper Heritage**: Vintage sepia tones and inked roads.
 - **Volcanic Ash**: Deep charcoal with glowing ember accents.
 - **Blueprint Classic**: Technical cyanotype style for an architectural feel.
-- **Retro Synth**: 80s outrun aesthetic with neon magentas and electric blues.
-- **Desert Mirage**: Sun-bleached sands and warm terracotta tones.
-- **Copper Patina**: Aged bronze and oxidized turquoise for a weathered metal look.
-- **Sakura Bloom**: Soft cherry blossom pinks and delicate cream tones.
-- **Royal Velvet**: Deep regal purples paired with rich metallic gold.
-- **Forest Shadow**: Moody deep evergreen tones with misty highlights.
-- **Ethereal Ghost**: Ultra-minimalist light greys and silvery whites.
-- **Solar Flare**: High-energy oranges and blacks inspired by sunspots.
-- **Charcoal Sketch**: The look of graphite on textured heavy-grain paper.
-- **Ancient Woodland**: Deep forest greens and mossy textures.
-- **Riverine Flow**: Cool aquas and deep teals emphasizing water movement.
-- **Arid Canyon**: Dusty ochre and sun-scorched earth tones.
-- **Mangrove Maze**: Murky swamp tones and brackish water for coastal wetlands.
-- **Steel Metropolis**: Cold slate and concrete greys for a modern cityscape.
+- ...and many more unique themes like Retro Synth, Charcoal Sketch, and Sakura Bloom.
 
 ### Customizing Themes
 You can easily add your own artistic themes by editing [src/core/artistic-themes.js](src/core/artistic-themes.js):
@@ -71,10 +62,10 @@ You can easily add your own artistic themes by editing [src/core/artistic-themes
 your_theme_key: {
     name: "Your Theme Name",
     description: "Brief description of the style",
-    bg: "#HEXCODE",           // Page/Background color
-    text: "#HEXCODE",         // Labels and text color
-    water: "#HEXCODE",        // Rivers, lakes, and oceans
-    parks: "#HEXCODE",        // Green spaces and forests
+    bg: "#HEXCODE",
+    text: "#HEXCODE",
+    water: "#HEXCODE",
+    parks: "#HEXCODE",
     road_motorway: "#HEXCODE",
     road_primary: "#HEXCODE",
     road_secondary: "#HEXCODE",
@@ -132,6 +123,8 @@ Follow these steps to get a local copy up and running.
 2. **Synchronized Viewports**: The Leaflet and MapLibre viewports are bidirectionally synced, ensuring consistency regardless of which interface is being manipulated.
 3. **Draggable Overlay**: The city-label overlay is positioned with CSS `left`/`top` percentages and `translate(-50%, -50%)`. During drag and on every style update, the overlay's rendered `offsetWidth`/`offsetHeight` are read and used to clamp its position so it never bleeds outside the poster edges — providing a symmetric 8 px minimum gap on all four sides regardless of city name length.
 4. **Capture Logic**: High-fidelity exports are achieved by scaling the map containers to the target resolution before rendering with `html2canvas` or internal GL buffers. The `onclone` callback replicates all live-preview styles — including overlay position clamping, vignette type, and field visibility — into the cloned document before capture.
+
+Inspired by [originalankur/maptoposter](https://github.com/originalankur/maptoposter). This project is an independent implementation built with a different stack and architecture.
 
 ## 📧 Contact
 
