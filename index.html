@@ -18,15 +18,42 @@
 
 <body class="bg-[#f8fafc] h-screen flex flex-col md:flex-row overflow-hidden">
 
-	<button id="mobile-toggle" class="md:hidden fixed bottom-8 right-4 z-[60] w-14 h-14 bg-slate-900 text-white rounded-2xl shadow-2xl flex items-center justify-center active:scale-95 transition-all">
-		<svg class="w-6 h-6 toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16m-7 6h7" />
-		</svg>
-	</button>
+	<nav id="mobile-nav" class="md:hidden fixed bottom-0 left-0 right-0 z-[60] flex items-center justify-center gap-3 px-4 pb-5 pt-2">
+		<div class="flex-1 bg-white/95 backdrop-blur-xl rounded-[1.75rem] shadow-2xl shadow-slate-900/15 border border-white/60 flex items-center p-1.5 gap-1">
+			<button id="nav-btn-a" class="mobile-nav-btn flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 px-2 rounded-2xl transition-all duration-200 text-slate-400" data-target="mobile-sheet-a">
+				<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+				</svg>
+				<span class="mobile-nav-label text-[9px] font-black uppercase tracking-wider opacity-0 max-h-0 overflow-hidden transition-all duration-200">Location</span>
+			</button>
+			<button id="nav-btn-b" class="mobile-nav-btn flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 px-2 rounded-2xl transition-all duration-200 text-slate-400" data-target="mobile-sheet-b">
+				<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+				</svg>
+				<span class="mobile-nav-label text-[9px] font-black uppercase tracking-wider opacity-0 max-h-0 overflow-hidden transition-all duration-200">Style</span>
+			</button>
+			<button id="nav-btn-c" class="mobile-nav-btn flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 px-2 rounded-2xl transition-all duration-200 text-slate-400" data-target="mobile-sheet-c">
+				<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+				</svg>
+				<span class="mobile-nav-label text-[9px] font-black uppercase tracking-wider opacity-0 max-h-0 overflow-hidden transition-all duration-200">Output</span>
+			</button>
+			<button id="nav-btn-d" class="mobile-nav-btn flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 px-2 rounded-2xl transition-all duration-200 text-slate-400" data-target="credits-modal">
+				<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+				</svg>
+				<span class="mobile-nav-label text-[9px] font-black uppercase tracking-wider opacity-0 max-h-0 overflow-hidden transition-all duration-200">About</span>
+			</button>
+		</div>
+		<button id="mobile-export-btn" class="w-14 h-14 bg-accent rounded-full shadow-2xl shadow-accent/40 flex items-center justify-center flex-shrink-0 active:scale-95 transition-all duration-200">
+			<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+			</svg>
+		</button>
+	</nav>
 
-	<div id="sidebar-overlay" class="sidebar-overlay fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity md:hidden"></div>
-
-	<aside class="fixed md:relative inset-y-0 left-0 w-[85%] md:w-[380px] h-full bg-white border-r border-slate-100 flex flex-col z-50 shadow-2xl md:shadow-none -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out overflow-hidden">
+	<aside class="hidden md:flex md:flex-col md:relative md:w-[380px] md:h-full bg-white border-r border-slate-100 overflow-hidden">
 		<div class="p-8 pb-6 flex items-center justify-between">
 			<button id="logo-btn" class="flex items-center space-x-3 hover:opacity-80 transition-opacity text-left outline-none group">
 				<div class="w-10 h-10 bg-accent rounded-xl flex items-center justify-center shadow-lg shadow-accent group-active:scale-95 transition-transform logo-pulse">
@@ -47,7 +74,7 @@
 
 		<div class="flex-1 overflow-y-auto px-8 py-4 space-y-8 no-scrollbar">
 
-			<div class="space-y-4">
+			<div id="section-location" class="space-y-4">
 				<div class="flex items-center justify-between">
 					<h3 class="text-sm font-semibold text-slate-900">1. Define Location</h3>
 					<span class="w-5 h-5 bg-slate-100 rounded-md flex items-center justify-center text-[10px] font-bold text-slate-400">01</span>
@@ -113,7 +140,7 @@
 				</div>
 			</div>
 
-			<div class="space-y-4">
+			<div id="section-marker" class="space-y-4">
 				<div class="flex items-center justify-between">
 					<h3 class="text-sm font-semibold text-slate-900">2. Marker & Route</h3>
 					<span class="w-5 h-5 bg-slate-100 rounded-md flex items-center justify-center text-[10px] font-bold text-slate-400">02</span>
@@ -204,7 +231,7 @@
 				</div>
 			</div>
 
-			<div class="space-y-4">
+			<div id="section-style" class="space-y-4">
 				<div class="flex items-center justify-between">
 					<h3 class="text-sm font-semibold text-slate-900">3. Map Style</h3>
 					<span class="w-5 h-5 bg-slate-100 rounded-md flex items-center justify-center text-[10px] font-bold text-slate-400">03</span>
@@ -248,7 +275,7 @@
 				</div>
 			</div>
 
-			<div class="space-y-4">
+			<div id="section-composition" class="space-y-4">
 				<div class="flex items-center justify-between">
 					<h3 class="text-sm font-semibold text-slate-900">4. Composition</h3>
 					<span class="w-5 h-5 bg-slate-100 rounded-md flex items-center justify-center text-[10px] font-bold text-slate-400">04</span>
@@ -330,7 +357,7 @@
 				</div>
 			</div>
 
-			<div class="space-y-4">
+			<div id="section-typography" class="space-y-4">
 				<div class="flex items-center justify-between">
 					<h3 class="text-sm font-semibold text-slate-900">5. Typography</h3>
 					<span class="w-5 h-5 bg-slate-100 rounded-md flex items-center justify-center text-[10px] font-bold text-slate-400">05</span>
@@ -401,7 +428,7 @@
 				</div>
 			</div>
 
-			<div class="space-y-4">
+			<div id="section-mat" class="space-y-4">
 				<div class="flex items-center justify-between">
 					<h3 class="text-sm font-semibold text-slate-900">6. Mat / Passepartout</h3>
 					<span class="w-5 h-5 bg-slate-100 rounded-md flex items-center justify-center text-[10px] font-bold text-slate-400">06</span>
@@ -454,7 +481,7 @@
 				</div>
 			</div>
 
-			<div class="space-y-4">
+			<div id="section-output" class="space-y-4">
 				<div class="flex items-center justify-between">
 					<h3 class="text-sm font-semibold text-slate-900">7. Output Size</h3>
 					<span class="w-5 h-5 bg-slate-100 rounded-md flex items-center justify-center text-[10px] font-bold text-slate-400">07</span>
@@ -516,7 +543,7 @@
 		</div>
 	</aside>
 
-	<main class="flex-1 overflow-hidden flex items-center justify-center p-4 md:p-16 relative bg-[#f1f5f9] perspective-lg">
+	<main class="flex-1 overflow-hidden flex items-center justify-center p-4 pb-28 md:p-16 md:pb-16 relative bg-[#f1f5f9] perspective-lg">
 		<div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-20">
 			<div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-accent-soft blur-[120px] rounded-full"></div>
 			<div class="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-accent-soft blur-[120px] rounded-full"></div>
@@ -552,6 +579,60 @@
 			</div>
 		</div>
 	</main>
+
+	<div id="mobile-sheet-a" class="mobile-settings-modal md:hidden fixed inset-x-0 bottom-0 z-[80] pointer-events-none">
+		<div class="sheet-backdrop absolute inset-0 -top-[100vh] bg-slate-900/50 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
+		<div class="sheet-panel relative bg-white rounded-t-[2rem] shadow-2xl translate-y-full transition-transform duration-300 max-h-[82vh] flex flex-col">
+			<div class="flex-shrink-0 px-6 pt-5 pb-4 flex items-center justify-between border-b border-slate-100">
+				<div>
+					<h2 class="text-lg font-bold text-slate-900">Location &amp; Markers</h2>
+					<p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">Define Location · Marker &amp; Route</p>
+				</div>
+				<button class="close-sheet-btn w-9 h-9 flex items-center justify-center rounded-xl hover:bg-slate-100 transition-colors" data-sheet="mobile-sheet-a">
+					<svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+			<div id="mobile-sheet-a-content" class="flex-1 overflow-y-auto px-6 py-5 space-y-6 no-scrollbar"></div>
+		</div>
+	</div>
+
+	<div id="mobile-sheet-b" class="mobile-settings-modal md:hidden fixed inset-x-0 bottom-0 z-[80] pointer-events-none">
+		<div class="sheet-backdrop absolute inset-0 -top-[100vh] bg-slate-900/50 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
+		<div class="sheet-panel relative bg-white rounded-t-[2rem] shadow-2xl translate-y-full transition-transform duration-300 max-h-[82vh] flex flex-col">
+			<div class="flex-shrink-0 px-6 pt-5 pb-4 flex items-center justify-between border-b border-slate-100">
+				<div>
+					<h2 class="text-lg font-bold text-slate-900">Map Style</h2>
+					<p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">Map Style · Composition · Typography</p>
+				</div>
+				<button class="close-sheet-btn w-9 h-9 flex items-center justify-center rounded-xl hover:bg-slate-100 transition-colors" data-sheet="mobile-sheet-b">
+					<svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+			<div id="mobile-sheet-b-content" class="flex-1 overflow-y-auto px-6 py-5 space-y-6 no-scrollbar"></div>
+		</div>
+	</div>
+
+	<div id="mobile-sheet-c" class="mobile-settings-modal md:hidden fixed inset-x-0 bottom-0 z-[80] pointer-events-none">
+		<div class="sheet-backdrop absolute inset-0 -top-[100vh] bg-slate-900/50 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
+		<div class="sheet-panel relative bg-white rounded-t-[2rem] shadow-2xl translate-y-full transition-transform duration-300 max-h-[82vh] flex flex-col">
+			<div class="flex-shrink-0 px-6 pt-5 pb-4 flex items-center justify-between border-b border-slate-100">
+				<div>
+					<h2 class="text-lg font-bold text-slate-900">Output</h2>
+					<p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">Mat / Passepartout · Output Size</p>
+				</div>
+				<button class="close-sheet-btn w-9 h-9 flex items-center justify-center rounded-xl hover:bg-slate-100 transition-colors" data-sheet="mobile-sheet-c">
+					<svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+			<div id="mobile-sheet-c-content" class="flex-1 overflow-y-auto px-6 py-5 space-y-6 no-scrollbar"></div>
+		</div>
+	</div>
 
 	<div id="credits-modal" class="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300">
 		<div id="credits-overlay" class="absolute inset-0 bg-slate-900/60 backdrop-blur-md"></div>
@@ -699,6 +780,130 @@
 		window.addEventListener('load', () => {
 			document.body.classList.add('loaded');
 		});
+
+		(function () {
+			const SHEET_SECTIONS = {
+				'mobile-sheet-a': ['section-location', 'section-marker'],
+				'mobile-sheet-b': ['section-style', 'section-composition', 'section-typography'],
+				'mobile-sheet-c': ['section-mat', 'section-output'],
+			};
+
+			const placeholders = {};
+			let activeSheet = null;
+			let activeNavBtn = null;
+
+			function openSheet(sheetId) {
+				if (sheetId === 'credits-modal') {
+					document.getElementById('credits-modal').classList.add('show');
+					return;
+				}
+
+				const sheet = document.getElementById(sheetId);
+				if (!sheet) return;
+
+				const contentEl = document.getElementById(sheetId + '-content');
+				const sectionIds = SHEET_SECTIONS[sheetId];
+
+				sectionIds.forEach(function (id) {
+					const section = document.getElementById(id);
+					if (!section || !section.parentNode) return;
+					const ph = document.createElement('div');
+					ph.id = id + '-ph';
+					ph.style.display = 'none';
+					section.parentNode.insertBefore(ph, section);
+					placeholders[id] = ph;
+					contentEl.appendChild(section);
+				});
+
+				sheet.classList.add('show');
+				activeSheet = sheetId;
+			}
+
+			function closeSheet(sheetId) {
+				if (!sheetId || sheetId === 'credits-modal') return;
+
+				const sheet = document.getElementById(sheetId);
+				if (!sheet) return;
+
+				const sectionIds = SHEET_SECTIONS[sheetId];
+
+				sectionIds.forEach(function (id) {
+					const section = document.getElementById(id);
+					const ph = placeholders[id] || document.getElementById(id + '-ph');
+					if (!ph || !section) return;
+					ph.parentNode.insertBefore(section, ph);
+					ph.remove();
+					delete placeholders[id];
+				});
+
+				sheet.classList.remove('show');
+
+				if (activeNavBtn) {
+					activeNavBtn.classList.remove('active');
+					activeNavBtn = null;
+				}
+				activeSheet = null;
+			}
+
+			function closeActiveSheet() {
+				if (activeSheet) closeSheet(activeSheet);
+			}
+
+			document.querySelectorAll('.mobile-nav-btn').forEach(function (btn) {
+				btn.addEventListener('click', function () {
+					const target = btn.getAttribute('data-target');
+
+					if (activeSheet === target) {
+						closeActiveSheet();
+						btn.classList.remove('active');
+						return;
+					}
+
+					closeActiveSheet();
+
+					btn.classList.add('active');
+					activeNavBtn = btn;
+
+					openSheet(target);
+				});
+			});
+
+			document.addEventListener('click', function (e) {
+				const btn = e.target.closest('.close-sheet-btn');
+				if (btn) {
+					const sheetId = btn.getAttribute('data-sheet');
+					closeSheet(sheetId);
+					document.querySelectorAll('.mobile-nav-btn').forEach(function (nb) {
+						if (nb.getAttribute('data-target') === sheetId) nb.classList.remove('active');
+					});
+				}
+			});
+
+			document.querySelectorAll('.mobile-settings-modal .sheet-backdrop').forEach(function (bd) {
+				bd.addEventListener('click', function () {
+					const sheet = bd.closest('.mobile-settings-modal');
+					if (sheet) {
+						closeSheet(sheet.id);
+						document.querySelectorAll('.mobile-nav-btn').forEach(function (nb) {
+							if (nb.getAttribute('data-target') === sheet.id) nb.classList.remove('active');
+						});
+					}
+				});
+			});
+
+			document.getElementById('close-credits')?.addEventListener('click', function () {
+				document.querySelectorAll('.mobile-nav-btn').forEach(function (nb) {
+					nb.classList.remove('active');
+				});
+				activeNavBtn = null;
+			});
+			document.getElementById('credits-overlay')?.addEventListener('click', function () {
+				document.querySelectorAll('.mobile-nav-btn').forEach(function (nb) {
+					nb.classList.remove('active');
+				});
+				activeNavBtn = null;
+			});
+		})();
 	</script>
 </body>
 
