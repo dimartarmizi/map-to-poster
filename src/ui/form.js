@@ -887,13 +887,15 @@ export function setupControls() {
 	});
 
 	const resetSettingsBtn = document.getElementById('reset-settings-btn');
-	if (resetSettingsBtn) {
-		resetSettingsBtn.addEventListener('click', () => {
-			if (confirm('Are you sure you want to reset all settings?')) {
-				updateState(defaultState);
-			}
-		});
+	function doResetSettings() {
+		if (confirm('Are you sure you want to reset all settings?')) {
+			updateState(defaultState);
+		}
 	}
+	if (resetSettingsBtn) resetSettingsBtn.addEventListener('click', doResetSettings);
+	['mobile-reset-a-btn', 'mobile-reset-b-btn', 'mobile-reset-c-btn'].forEach(id => {
+		document.getElementById(id)?.addEventListener('click', doResetSettings);
+	});
 
 	const overlayPosBtns = document.querySelectorAll('.overlay-pos-btn');
 	const overlayPositionGroup = document.getElementById('overlay-position-group');
