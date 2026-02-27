@@ -206,7 +206,7 @@ export function updateMapTheme(tileUrl) {
 	}
 }
 
-export function waitForTilesLoad(timeout = 5000) {
+export function waitForTilesLoad(timeout = 30000) {
 	return new Promise((resolve) => {
 		if (!map || !tileLayer) return resolve();
 		try {
@@ -227,7 +227,7 @@ export function waitForTilesLoad(timeout = 5000) {
 	});
 }
 
-export function waitForArtisticIdle(timeout = 2000) {
+export function waitForArtisticIdle(timeout = 30000) {
 	return new Promise((resolve) => {
 		if (!artisticMap) return resolve();
 		let resolved = false;

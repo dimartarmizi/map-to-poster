@@ -80,9 +80,9 @@ async function ensurePreviewReady() {
 	try {
 		setExportButtonLoading(true, 'loading');
 		if (state.renderMode === 'artistic') {
-			await waitForArtisticIdle(3000);
+			await waitForArtisticIdle(30000);
 		} else {
-			await waitForTilesLoad(5000);
+			await waitForTilesLoad(30000);
 		}
 	} finally {
 		setExportButtonLoading(false);
