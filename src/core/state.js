@@ -1,5 +1,6 @@
 import { themes } from './themes.js';
 import { artisticThemes } from './artistic-themes.js';
+import { loadCustomThemes } from './custom-themes.js';
 
 let observers = [];
 
@@ -139,5 +140,9 @@ export function getSelectedTheme() {
 }
 
 export function getSelectedArtisticTheme() {
+	if (state.artisticTheme && state.artisticTheme.startsWith('custom_')) {
+		const custom = loadCustomThemes();
+		if (custom[state.artisticTheme]) return custom[state.artisticTheme];
+	}
 	return artisticThemes[state.artisticTheme] || artisticThemes.cyber_noir;
 }

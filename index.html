@@ -751,6 +751,145 @@
 		</div>
 	</div>
 
+	<div id="custom-theme-modal" class="fixed inset-0 z-[110] flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300">
+		<div id="custom-theme-modal-overlay" class="absolute inset-0 bg-slate-900/60 backdrop-blur-md"></div>
+		<div class="relative w-[92%] max-w-lg max-h-[90vh] bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col scale-95 transition-transform duration-300">
+			<div class="p-6 pb-5 border-b border-slate-100 flex items-center justify-between shrink-0">
+				<div>
+					<h2 id="custom-theme-modal-title" class="text-xl font-bold text-slate-900">Create Custom Theme</h2>
+					<p class="text-[10px] text-slate-400 font-medium uppercase tracking-wider mt-0.5">Saved in your browser</p>
+				</div>
+				<button id="close-custom-theme-modal" class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-100 transition-colors">
+					<svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+
+			<div class="flex-1 overflow-y-auto p-6 space-y-5 no-scrollbar">
+				<div class="space-y-3">
+					<div>
+						<label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Theme Name *</label>
+						<input id="ct-name" type="text" maxlength="40" placeholder="My Custom Theme" class="mt-1.5 w-full input-field" />
+					</div>
+					<div>
+						<label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Description</label>
+						<input id="ct-desc" type="text" maxlength="80" placeholder="Optional short description" class="mt-1.5 w-full input-field" />
+					</div>
+				</div>
+
+				<div class="space-y-2">
+					<p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Background & Text</p>
+					<div class="grid grid-cols-2 gap-2">
+						<div class="flex items-center gap-2.5 p-3 bg-slate-50 rounded-xl">
+							<input type="color" id="ct-bg" value="#0B0B16" class="w-9 h-9 rounded-lg cursor-pointer shrink-0 border-0 p-0" />
+							<div class="min-w-0">
+								<div class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Background</div>
+								<input type="text" id="ct-bg-hex" maxlength="7" class="text-xs font-mono text-slate-700 bg-transparent border-0 outline-none w-full p-0" placeholder="#0b0b16" />
+							</div>
+						</div>
+						<div class="flex items-center gap-2.5 p-3 bg-slate-50 rounded-xl">
+							<input type="color" id="ct-text" value="#ffffff" class="w-9 h-9 rounded-lg cursor-pointer shrink-0 border-0 p-0" />
+							<div class="min-w-0">
+								<div class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Text / Labels</div>
+								<input type="text" id="ct-text-hex" maxlength="7" class="text-xs font-mono text-slate-700 bg-transparent border-0 outline-none w-full p-0" placeholder="#ffffff" />
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="space-y-2">
+					<p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Map Areas</p>
+					<div class="grid grid-cols-2 gap-2">
+						<div class="flex items-center gap-2.5 p-3 bg-slate-50 rounded-xl">
+							<input type="color" id="ct-water" value="#071020" class="w-9 h-9 rounded-lg cursor-pointer shrink-0 border-0 p-0" />
+							<div class="min-w-0">
+								<div class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Water</div>
+								<input type="text" id="ct-water-hex" maxlength="7" class="text-xs font-mono text-slate-700 bg-transparent border-0 outline-none w-full p-0" placeholder="#071020" />
+							</div>
+						</div>
+						<div class="flex items-center gap-2.5 p-3 bg-slate-50 rounded-xl">
+							<input type="color" id="ct-parks" value="#111122" class="w-9 h-9 rounded-lg cursor-pointer shrink-0 border-0 p-0" />
+							<div class="min-w-0">
+								<div class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Parks</div>
+								<input type="text" id="ct-parks-hex" maxlength="7" class="text-xs font-mono text-slate-700 bg-transparent border-0 outline-none w-full p-0" placeholder="#111122" />
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="space-y-2">
+					<p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Roads</p>
+					<div class="grid grid-cols-2 gap-2">
+						<div class="flex items-center gap-2.5 p-3 bg-slate-50 rounded-xl">
+							<input type="color" id="ct-road-motorway" value="#FF2AE6" class="w-9 h-9 rounded-lg cursor-pointer shrink-0 border-0 p-0" />
+							<div class="min-w-0">
+								<div class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Motorway</div>
+								<input type="text" id="ct-road-motorway-hex" maxlength="7" class="text-xs font-mono text-slate-700 bg-transparent border-0 outline-none w-full p-0" placeholder="#ff2ae6" />
+							</div>
+						</div>
+						<div class="flex items-center gap-2.5 p-3 bg-slate-50 rounded-xl">
+							<input type="color" id="ct-road-primary" value="#00E5FF" class="w-9 h-9 rounded-lg cursor-pointer shrink-0 border-0 p-0" />
+							<div class="min-w-0">
+								<div class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Primary</div>
+								<input type="text" id="ct-road-primary-hex" maxlength="7" class="text-xs font-mono text-slate-700 bg-transparent border-0 outline-none w-full p-0" placeholder="#00e5ff" />
+							</div>
+						</div>
+						<div class="flex items-center gap-2.5 p-3 bg-slate-50 rounded-xl">
+							<input type="color" id="ct-road-secondary" value="#00BEBE" class="w-9 h-9 rounded-lg cursor-pointer shrink-0 border-0 p-0" />
+							<div class="min-w-0">
+								<div class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Secondary</div>
+								<input type="text" id="ct-road-secondary-hex" maxlength="7" class="text-xs font-mono text-slate-700 bg-transparent border-0 outline-none w-full p-0" placeholder="#00bebe" />
+							</div>
+						</div>
+						<div class="flex items-center gap-2.5 p-3 bg-slate-50 rounded-xl">
+							<input type="color" id="ct-road-tertiary" value="#008F95" class="w-9 h-9 rounded-lg cursor-pointer shrink-0 border-0 p-0" />
+							<div class="min-w-0">
+								<div class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Tertiary</div>
+								<input type="text" id="ct-road-tertiary-hex" maxlength="7" class="text-xs font-mono text-slate-700 bg-transparent border-0 outline-none w-full p-0" placeholder="#008f95" />
+							</div>
+						</div>
+						<div class="flex items-center gap-2.5 p-3 bg-slate-50 rounded-xl">
+							<input type="color" id="ct-road-residential" value="#005E66" class="w-9 h-9 rounded-lg cursor-pointer shrink-0 border-0 p-0" />
+							<div class="min-w-0">
+								<div class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Residential</div>
+								<input type="text" id="ct-road-residential-hex" maxlength="7" class="text-xs font-mono text-slate-700 bg-transparent border-0 outline-none w-full p-0" placeholder="#005e66" />
+							</div>
+						</div>
+						<div class="flex items-center gap-2.5 p-3 bg-slate-50 rounded-xl">
+							<input type="color" id="ct-road-default" value="#008F95" class="w-9 h-9 rounded-lg cursor-pointer shrink-0 border-0 p-0" />
+							<div class="min-w-0">
+								<div class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Default</div>
+								<input type="text" id="ct-road-default-hex" maxlength="7" class="text-xs font-mono text-slate-700 bg-transparent border-0 outline-none w-full p-0" placeholder="#008f95" />
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="space-y-2">
+					<p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Route & Markers</p>
+					<div class="grid grid-cols-2 gap-2">
+						<div class="flex items-center gap-2.5 p-3 bg-slate-50 rounded-xl">
+							<input type="color" id="ct-route" value="#EAB308" class="w-9 h-9 rounded-lg cursor-pointer shrink-0 border-0 p-0" />
+							<div class="min-w-0">
+								<div class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Route Color</div>
+								<input type="text" id="ct-route-hex" maxlength="7" class="text-xs font-mono text-slate-700 bg-transparent border-0 outline-none w-full p-0" placeholder="#eab308" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="p-5 bg-slate-50 border-t border-slate-100 flex items-center shrink-0">
+				<button id="custom-theme-delete-btn" class="hidden px-4 py-2 text-sm font-semibold text-red-500 hover:bg-red-50 rounded-xl transition-colors">Delete</button>
+				<div class="flex gap-2 ml-auto">
+					<button id="custom-theme-cancel-btn" class="px-5 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-200 rounded-xl transition-colors">Cancel</button>
+					<button id="custom-theme-save-btn" class="px-5 py-2.5 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-accent transition-colors">Save Theme</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<div id="presets-modal" class="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300">
 		<div id="modal-overlay" class="absolute inset-0 bg-slate-900/60 backdrop-blur-md"></div>
 		<div class="relative w-[90%] max-w-2xl max-h-[85vh] bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col scale-95 transition-transform duration-300">
