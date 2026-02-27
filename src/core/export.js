@@ -13,6 +13,28 @@ function project(lat, lon, scale) {
 	};
 }
 
+const IOS_MAX_CANVAS_PIXELS = 16777216;
+
+async function fetchTileAsBlobURL(src) {
+	try {
+		const resp = await fetch(src, { mode: 'cors', credentials: 'omit' });
+		if (!resp.ok) return null;
+		const blob = await resp.blob();
+		return URL.createObjectURL(blob);
+	} catch {
+		return null;
+	}
+}
+
+function loadImage(src) {
+	return new Promise((resolve) => {
+		const img = new Image();
+		img.onload = () => resolve(img);
+		img.onerror = () => resolve(null);
+		img.src = src;
+	});
+}
+
 async function captureMapSnapshot() {
 	const artisticContainer = document.getElementById('artistic-map');
 	const mapPreviewContainer = document.getElementById('map-preview');
@@ -26,9 +48,17 @@ async function captureMapSnapshot() {
 	const effectiveWidth = state.width - (2 * matWidth);
 	const effectiveHeight = state.height - (2 * matWidth);
 
+	let canvasWidth = Math.max(1, effectiveWidth);
+	let canvasHeight = Math.max(1, effectiveHeight);
+	if (canvasWidth * canvasHeight > IOS_MAX_CANVAS_PIXELS) {
+		const ratio = Math.sqrt(IOS_MAX_CANVAS_PIXELS / (canvasWidth * canvasHeight));
+		canvasWidth = Math.floor(canvasWidth * ratio);
+		canvasHeight = Math.floor(canvasHeight * ratio);
+	}
+
 	const canvas = document.createElement('canvas');
-	canvas.width = Math.max(1, effectiveWidth);
-	canvas.height = Math.max(1, effectiveHeight);
+	canvas.width = canvasWidth;
+	canvas.height = canvasHeight;
 	const ctx = canvas.getContext('2d');
 
 	if (isArtistic) {
@@ -49,16 +79,26 @@ async function captureMapSnapshot() {
 
 				artisticMap.resize();
 
+				let mapDataURL = null;
 				await new Promise(resolve => {
-					const timer = setTimeout(resolve, 1500);
+					const timer = setTimeout(() => {
+						try { mapDataURL = artisticMap.getCanvas().toDataURL(); } catch (e) { }
+						resolve();
+					}, 1500);
 					artisticMap.once('idle', () => {
 						clearTimeout(timer);
+						try { mapDataURL = artisticMap.getCanvas().toDataURL(); } catch (e) { }
 						resolve();
 					});
 				});
 
-				const mapCanvas = artisticMap.getCanvas();
-				ctx.drawImage(mapCanvas, 0, 0, canvas.width, canvas.height);
+				if (mapDataURL) {
+					const mapImg = await loadImage(mapDataURL);
+					if (mapImg) ctx.drawImage(mapImg, 0, 0, canvas.width, canvas.height);
+				} else {
+					const mapCanvas = artisticMap.getCanvas();
+					ctx.drawImage(mapCanvas, 0, 0, canvas.width, canvas.height);
+				}
 
 				const scaleFactor = effectiveWidth / (originalWidthPx || 500);
 
@@ -127,18 +167,28 @@ async function captureMapSnapshot() {
 
 			const scaleFactor = effectiveWidth / containerRect.width;
 
-			tiles.forEach(tile => {
-				if (tile.complete && tile.naturalWidth > 0) {
+			const tileData = tiles
+				.filter(tile => tile.complete && tile.naturalWidth > 0)
+				.map(tile => {
 					const tileRect = tile.getBoundingClientRect();
+					return {
+						src: tile.src,
+						x: (tileRect.left - containerRect.left) * scaleFactor,
+						y: (tileRect.top - containerRect.top) * scaleFactor,
+						w: tileRect.width * scaleFactor,
+						h: tileRect.height * scaleFactor,
+					};
+				});
 
-					const x = (tileRect.left - containerRect.left) * scaleFactor;
-					const y = (tileRect.top - containerRect.top) * scaleFactor;
-					const w = tileRect.width * scaleFactor;
-					const h = tileRect.height * scaleFactor;
-
-					ctx.drawImage(tile, x, y, w, h);
+			await Promise.all(tileData.map(async (td) => {
+				let blobURL = await fetchTileAsBlobURL(td.src);
+				if (!blobURL) {
+					blobURL = td.src;
 				}
-			});
+				const img = await loadImage(blobURL);
+				if (img) ctx.drawImage(img, td.x, td.y, td.w, td.h);
+				if (blobURL.startsWith('blob:')) URL.revokeObjectURL(blobURL);
+			}));
 
 			if (state.showMarker && state.markers && state.markers.length > 0) {
 				const map = getMapInstance();
@@ -257,8 +307,12 @@ async function drawMarkerToCtx(ctx, x, y, color) {
 
 	return new Promise((resolve) => {
 		const img = new Image();
-		const url = 'data:image/svg+xml;base64,' + btoa(svg);
-
+		let url;
+		try {
+			url = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
+		} catch {
+			url = 'data:image/svg+xml,' + encodeURIComponent(svg);
+		}
 		img.onload = () => {
 			const anchorX = size / 2;
 			const anchorY = iconType === 'pin' ? size : size / 2;
@@ -285,13 +339,21 @@ export async function exportToPNG(element, filename, statusElement, options = {}
 		const posterContainerEl = document.getElementById('poster-container');
 		const logicalContainerWidth = posterContainerEl ? (posterContainerEl.offsetWidth || targetWidth) : targetWidth;
 		const logicalContainerHeight = posterContainerEl ? (posterContainerEl.offsetHeight || targetHeight) : targetHeight;
-		const scale = logicalContainerWidth > 0 ? (targetWidth / logicalContainerWidth) : 1;
 
-		const canvas = await html2canvas(element, {
+		let outputW = targetWidth;
+		let outputH = targetHeight;
+		if (outputW * outputH > IOS_MAX_CANVAS_PIXELS) {
+			const ratio = Math.sqrt(IOS_MAX_CANVAS_PIXELS / (outputW * outputH));
+			outputW = Math.floor(outputW * ratio);
+			outputH = Math.floor(outputH * ratio);
+		}
+		const scale = logicalContainerWidth > 0 ? (outputW / logicalContainerWidth) : 1;
+
+		const overlayCanvas = await html2canvas(element, {
 			useCORS: true,
 			scale: scale,
 			logging: false,
-			backgroundColor: '#ffffff',
+			backgroundColor: null,
 			width: Math.round(logicalContainerWidth),
 			height: Math.round(logicalContainerHeight),
 			windowWidth: Math.round(logicalContainerWidth),
@@ -341,7 +403,7 @@ export async function exportToPNG(element, filename, statusElement, options = {}
 					clonedContainer.style.margin = '0';
 					clonedContainer.style.boxShadow = 'none';
 					clonedContainer.style.overflow = 'hidden';
-					clonedContainer.style.backgroundColor = activeTheme.background || activeTheme.bg || '#ffffff';
+					clonedContainer.style.backgroundColor = 'transparent';
 
 					const cMap = clonedDoc.querySelector('#map-preview');
 					const cArt = clonedDoc.querySelector('#artistic-map');
@@ -350,38 +412,25 @@ export async function exportToPNG(element, filename, statusElement, options = {}
 					if (cArt) cArt.style.visibility = 'hidden';
 					if (cBorder) cBorder.style.visibility = 'hidden';
 
+
 					const matEnabled = state.matEnabled;
 					const matWidthLogical = matEnabled ? (state.matWidth / scale) : 0;
 
-					if (snapshot) {
-						const img = clonedDoc.createElement('img');
-						img.src = snapshot;
-						img.style.position = 'absolute';
-						img.style.top = `${matWidthLogical}px`;
-						img.style.left = `${matWidthLogical}px`;
-						img.style.width = `${logicalContainerWidth - 2 * matWidthLogical}px`;
-						img.style.height = `${logicalContainerHeight - 2 * matWidthLogical}px`;
-						img.style.objectFit = 'cover';
-						img.style.zIndex = '0';
-						img.style.display = 'block';
-
-						if (matEnabled && state.matShowBorder) {
-							const borderDiv = clonedDoc.createElement('div');
-							borderDiv.style.position = 'absolute';
-							borderDiv.style.top = `${matWidthLogical}px`;
-							borderDiv.style.left = `${matWidthLogical}px`;
-							borderDiv.style.width = `${logicalContainerWidth - 2 * matWidthLogical}px`;
-							borderDiv.style.height = `${logicalContainerHeight - 2 * matWidthLogical}px`;
-							const borderWidth = (state.matBorderWidth || 1) / scale;
-							borderDiv.style.border = `${borderWidth}px solid ${textColor}`;
-							borderDiv.style.opacity = state.matBorderOpacity || 1;
-							borderDiv.style.zIndex = '6';
-							borderDiv.style.pointerEvents = 'none';
-							borderDiv.style.boxSizing = 'border-box';
-							clonedContainer.appendChild(borderDiv);
-						}
-
-						clonedContainer.prepend(img);
+					if (matEnabled && state.matShowBorder) {
+						const borderDiv = clonedDoc.createElement('div');
+						borderDiv.style.position = 'absolute';
+						borderDiv.style.top = `${matWidthLogical}px`;
+						borderDiv.style.left = `${matWidthLogical}px`;
+						borderDiv.style.width = `${logicalContainerWidth - 2 * matWidthLogical}px`;
+						borderDiv.style.height = `${logicalContainerHeight - 2 * matWidthLogical}px`;
+						const borderWidth = (state.matBorderWidth || 1) / scale;
+						const textColorForBorder = activeTheme.text || activeTheme.textColor || '#000000';
+						borderDiv.style.border = `${borderWidth}px solid ${textColorForBorder}`;
+						borderDiv.style.opacity = state.matBorderOpacity || 1;
+						borderDiv.style.zIndex = '6';
+						borderDiv.style.pointerEvents = 'none';
+						borderDiv.style.boxSizing = 'border-box';
+						clonedContainer.appendChild(borderDiv);
 					}
 
 					const vignette = clonedDoc.querySelector('#vignette-overlay');
@@ -524,9 +573,51 @@ export async function exportToPNG(element, filename, statusElement, options = {}
 			}
 		});
 
+		const isArtistic = state.renderMode === 'artistic';
+		const activeTheme = isArtistic ? getSelectedArtisticTheme() : getSelectedTheme();
+		const bgColor = activeTheme.background || activeTheme.bg || '#ffffff';
+
+		const finalCanvas = document.createElement('canvas');
+		finalCanvas.width = overlayCanvas.width;
+		finalCanvas.height = overlayCanvas.height;
+		const finalCtx = finalCanvas.getContext('2d');
+
+		finalCtx.fillStyle = bgColor;
+		finalCtx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+
+		if (snapshot) {
+			let snapSrc = snapshot;
+			try {
+				const arr = snapshot.split(',');
+				const mime = arr[0].match(/:(.*?);/)[1];
+				const bstr = atob(arr[1]);
+				let n = bstr.length;
+				const u8 = new Uint8Array(n);
+				while (n--) u8[n] = bstr.charCodeAt(n);
+				snapSrc = URL.createObjectURL(new Blob([u8], { type: mime }));
+			} catch (e) { }
+
+			const snapImg = await loadImage(snapSrc);
+			if (snapSrc.startsWith('blob:')) URL.revokeObjectURL(snapSrc);
+
+			if (snapImg) {
+				const matPx = state.matEnabled
+					? Math.round(state.matWidth * finalCanvas.width / targetWidth)
+					: 0;
+				finalCtx.drawImage(
+					snapImg,
+					matPx, matPx,
+					finalCanvas.width - 2 * matPx,
+					finalCanvas.height - 2 * matPx
+				);
+			}
+		}
+
+		finalCtx.drawImage(overlayCanvas, 0, 0);
+
 		const link = document.createElement('a');
 		link.download = filename;
-		link.href = canvas.toDataURL('image/png', 1.0);
+		link.href = finalCanvas.toDataURL('image/png', 1.0);
 		link.click();
 	} catch (error) {
 		console.error('Export failed:', error);
