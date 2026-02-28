@@ -469,7 +469,7 @@ export async function exportToPNG(element, filename, statusElement, options = {}
 					overlay.style.bottom = '';
 					overlay.style.transform = 'translate(-50%, -50%)';
 					overlay.style.maxWidth = '90%';
-					overlay.style.width = '';
+					overlay.style.width = 'max-content';
 					overlay.style.zIndex = '10';
 
 					const overlayX = state.overlayX !== undefined ? state.overlayX : 0.5;

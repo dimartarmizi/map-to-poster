@@ -1403,7 +1403,7 @@ export function updatePreviewStyles(currentState) {
 			overlay.style.bottom = '';
 			overlay.style.transform = 'translate(-50%, -50%)';
 			overlay.style.maxWidth = '90%';
-			overlay.style.width = '';
+			overlay.style.width = 'max-content';
 
 			overlay.style.left = `${overlayX * 100}%`;
 			overlay.style.top = `${overlayY * 100}%`;
