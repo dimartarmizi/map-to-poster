@@ -54,7 +54,11 @@ export function initMap(containerId, initialCenter, initialZoom, initialTileUrl)
 		isSyncing = false;
 	});
 
-	initArtisticMap('artistic-map', [initialCenter[1], initialCenter[0]], initialZoom - 1);
+	try {
+		initArtisticMap('artistic-map', [initialCenter[1], initialCenter[0]], initialZoom - 1);
+	} catch (err) {
+		console.error('Failed to initialize artistic map (MapLibre GL):', err);
+	}
 
 	if (state.showRoute) {
 		updateRouteGeometry();
