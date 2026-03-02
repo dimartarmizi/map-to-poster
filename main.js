@@ -6,7 +6,11 @@ import { setupControls, updatePreviewStyles } from './src/ui/form.js';
 import { exportToPNG } from './src/core/export.js';
 
 const initialTheme = getSelectedTheme();
-initMap('map-preview', [state.lat, state.lon], state.zoom, initialTheme.tileUrl);
+try {
+	initMap('map-preview', [state.lat, state.lon], state.zoom, initialTheme.tileUrl);
+} catch (err) {
+	console.error('Failed to initialize map:', err);
+}
 
 const syncUI = setupControls();
 
