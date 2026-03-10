@@ -1,5 +1,4 @@
 import L from 'leaflet';
-import maplibregl from 'maplibre-gl';
 import { state, updateState, getSelectedTheme, getSelectedArtisticTheme } from '../core/state.js';
 import { markerIcons } from '../core/marker-icons.js';
 import { getMap, getArtisticMap } from './map-init.js';
@@ -22,7 +21,7 @@ function getIconAnchor(iconName, size) {
 	return [size / 2, size / 2];
 }
 
-export function updateMarkerStyles(currentState) {
+export async function updateMarkerStyles(currentState) {
 	const map = getMap();
 	const artisticMap = getArtisticMap();
 	if (!map) return;
@@ -89,22 +88,25 @@ export function updateMarkerStyles(currentState) {
 				updateState({ markers: newMarkers });
 			});
 
-			const aMarker = new maplibregl.Marker({
-				element: el,
-				draggable: true,
-				anchor: iconType === 'pin' ? 'bottom' : 'center'
-			})
-				.setLngLat([markerData.lon, markerData.lat])
-				.addTo(artisticMap);
+			import('maplibre-gl').then(mod => {
+				const mgl = mod.default || mod;
+				const aMarker = new mgl.Marker({
+					element: el,
+					draggable: true,
+					anchor: iconType === 'pin' ? 'bottom' : 'center'
+				})
+					.setLngLat([markerData.lon, markerData.lat])
+					.addTo(artisticMap);
 
-			aMarker.on('dragend', () => {
-				const pos = aMarker.getLngLat();
-				const newMarkers = [...currentState.markers];
-				newMarkers[index] = { lat: pos.lat, lon: pos.lng };
-				updateState({ markers: newMarkers });
+				aMarker.on('dragend', () => {
+					const pos = aMarker.getLngLat();
+					const newMarkers = [...currentState.markers];
+					newMarkers[index] = { lat: pos.lat, lon: pos.lng };
+					updateState({ markers: newMarkers });
+				});
+
+				artisticMarkers.push(aMarker);
 			});
-
-			artisticMarkers.push(aMarker);
 		}
 	});
 }
