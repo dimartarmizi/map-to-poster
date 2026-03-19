@@ -1,11 +1,9 @@
 import L from 'leaflet';
+import maplibregl from 'maplibre-gl';
 import { state, updateState, getSelectedTheme, getSelectedArtisticTheme } from '../core/state.js';
 import { findBestInsertIndex } from '../core/utils.js';
 import { fetchOSRMRoute } from '../core/routing.js';
 import { getMap, getArtisticMap } from './map-init.js';
-
-let _maplibregl = null;
-export function setMapLibreGL(mgl) { _maplibregl = mgl; }
 
 let routeStartMarker = null;
 let routeEndMarker = null;
@@ -145,7 +143,7 @@ export function updateRouteStyles(state) {
 						interactive: false,
 						icon: L.divIcon({
 							className: 'ghost-point',
-							html: '<div class="w-3 h-3 bg-white/90 border-2 border-slate-400 rounded-full shadow-sm scale-90"></div>',
+							html: `<div class="w-3 h-3 bg-white/90 border-2 border-slate-400 rounded-full shadow-sm scale-90"></div>`,
 							iconSize: [12, 12],
 							iconAnchor: [6, 6]
 						})
@@ -252,7 +250,7 @@ export function updateRouteStyles(state) {
 					draggable: true,
 					icon: L.divIcon({
 						className: 'via-point',
-						html: '<div class="w-3.5 h-3.5 bg-white border-2 border-slate-700 rounded-full shadow-sm hover:scale-125 transition-transform cursor-grab"></div>',
+						html: `<div class="w-3.5 h-3.5 bg-white border-2 border-slate-700 rounded-full shadow-sm hover:scale-125 transition-transform cursor-grab"></div>`,
 						iconSize: [14, 14],
 						iconAnchor: [7, 7]
 					})
@@ -278,19 +276,21 @@ export function updateRouteStyles(state) {
 			}
 		}
 
-		if (artisticMap && _maplibregl) {
+		if (artisticMap) {
 			if (artisticViaMarkers.length !== currentViaData.length) {
 				artisticViaMarkers.forEach(m => m.remove());
 				artisticViaMarkers = currentViaData.map((p, idx) => {
 					const el = document.createElement('div');
 					el.className = 'artistic-via-point';
-					el.style.cssText = 'width:24px;height:24px;display:flex;align-items:center;justify-content:center;z-index:990';
+					el.style.width = '24px';
+					el.style.height = '24px';
+					el.style.display = 'flex';
+					el.style.alignItems = 'center';
+					el.style.justifyContent = 'center';
+					el.style.zIndex = '990';
+					el.innerHTML = `<div style="width: 12px; height: 12px; background: white; border: 2px solid #333; border-radius: 50%; box-shadow: 0 0 4px rgba(0,0,0,0.4); cursor: grab;"></div>`;
 
-					const dot = document.createElement('div');
-					dot.style.cssText = 'width:12px;height:12px;background:white;border:2px solid #333;border-radius:50%;box-shadow:0 0 4px rgba(0,0,0,0.4);cursor:grab';
-					el.appendChild(dot);
-
-					const am = new _maplibregl.Marker({ element: el, draggable: true })
+					const am = new maplibregl.Marker({ element: el, draggable: true })
 						.setLngLat([p.lon, p.lat])
 						.addTo(artisticMap);
 
@@ -328,13 +328,18 @@ export function updateRouteStyles(state) {
 			}
 		}
 
-		if (artisticMap && _maplibregl) {
+		if (artisticMap) {
 			if (!artisticRouteStartMarker) {
 				const el = document.createElement('div');
 				el.className = 'route-marker-a';
-				el.style.cssText = 'width:24px;height:24px;display:flex;align-items:center;justify-content:center;z-index:1000';
-				el.textContent = 'A';
-				artisticRouteStartMarker = new _maplibregl.Marker({ element: el, draggable: true }).setLngLat([start[1], start[0]]).addTo(artisticMap);
+				el.style.width = '24px';
+				el.style.height = '24px';
+				el.style.display = 'flex';
+				el.style.alignItems = 'center';
+				el.style.justifyContent = 'center';
+				el.style.zIndex = '1000';
+				el.innerHTML = routeMarkerHtml('A');
+				artisticRouteStartMarker = new maplibregl.Marker({ element: el, draggable: true }).setLngLat([start[1], start[0]]).addTo(artisticMap);
 				artisticRouteStartMarker.on('drag', () => {
 					if (isSyncing) return;
 					isSyncing = true;
@@ -351,9 +356,14 @@ export function updateRouteStyles(state) {
 			if (!artisticRouteEndMarker) {
 				const el = document.createElement('div');
 				el.className = 'route-marker-b';
-				el.style.cssText = 'width:24px;height:24px;display:flex;align-items:center;justify-content:center;z-index:1000';
-				el.textContent = 'B';
-				artisticRouteEndMarker = new _maplibregl.Marker({ element: el, draggable: true }).setLngLat([end[1], end[0]]).addTo(artisticMap);
+				el.style.width = '24px';
+				el.style.height = '24px';
+				el.style.display = 'flex';
+				el.style.alignItems = 'center';
+				el.style.justifyContent = 'center';
+				el.style.zIndex = '1000';
+				el.innerHTML = routeMarkerHtml('B');
+				artisticRouteEndMarker = new maplibregl.Marker({ element: el, draggable: true }).setLngLat([end[1], end[0]]).addTo(artisticMap);
 				artisticRouteEndMarker.on('drag', () => {
 					if (isSyncing) return;
 					isSyncing = true;
