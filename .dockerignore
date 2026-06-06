@@ -1,0 +1,11 @@
+node_modules
+dist
+.git
+.github
+.vscode
+npm-debug.log*
+Dockerfile*
+docker-compose*.yml
+docker-compose*.yaml
+README.md
+LICENSE

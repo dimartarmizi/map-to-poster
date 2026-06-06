@@ -112,6 +112,43 @@ Follow these steps to get a local copy up and running.
    ```
    Optimized files will be generated in the `dist/` folder.
 
+## 🐳 Deploy with Docker
+
+This project is ready to run as a lightweight Docker container using a multi-stage build:
+
+- **Build stage**: Uses Node.js to install dependencies and generate the Vite production build.
+- **Runtime stage**: Uses Nginx Alpine to serve the static files from `dist/`.
+
+### Build the image
+
+```bash
+docker build -t map-to-poster .
+```
+
+### Run the container
+
+```bash
+docker run -d -p 8080:80 --name map-to-poster map-to-poster
+```
+
+Then open `http://localhost:8080`.
+
+### Update deployment
+
+After pulling new changes, rebuild and recreate the container:
+
+```bash
+docker build -t map-to-poster .
+docker rm -f map-to-poster
+docker run -d -p 8080:80 --name map-to-poster map-to-poster
+```
+
+### Included Docker files
+
+- `Dockerfile` — multi-stage production image
+- `.dockerignore` — keeps the build context small
+- `docker/nginx.conf` — Nginx config with SPA fallback to `index.html`
+
 ## 📜 Technical Overview
 
 1. **Reactive State Management**: Uses an observer-pattern based store ([src/core/state.js](src/core/state.js)) to synchronize changes across the UI, Leaflet, and MapLibre engines. All user preferences are persisted via `localStorage`.
