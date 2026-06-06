@@ -14,6 +14,102 @@ function project(lat, lon, scale) {
 }
 
 const IOS_MAX_CANVAS_PIXELS = 16777216;
+const TEXT_SCALE_REFERENCE = 1080;
+const OVERLAY_SIZE_MULTIPLIER = {
+	small: 0.75,
+	medium: 1,
+	large: 1.35,
+};
+
+const BASE_OVERLAY_TEXT = {
+	pad: 48,
+	city: 64,
+	country: 20,
+	coords: 16,
+	gap: 8,
+	cityGap: 40,
+	dividerWidth: 128,
+	dividerHeight: 1.5,
+	attribution: 8,
+	attributionOffset: 12,
+};
+
+function getPosterTextScale(width, height) {
+	const shortestSide = Math.max(1, Math.min(width || TEXT_SCALE_REFERENCE, height || TEXT_SCALE_REFERENCE));
+	return shortestSide / TEXT_SCALE_REFERENCE;
+}
+
+function clamp(value, min, max) {
+	return Math.max(min, Math.min(max, value));
+}
+
+function getOverlayTextConfig(width, height, size = 'medium') {
+	const posterScale = getPosterTextScale(width, height);
+	const sizeMultiplier = OVERLAY_SIZE_MULTIPLIER[size] || OVERLAY_SIZE_MULTIPLIER.medium;
+	const scale = posterScale * sizeMultiplier;
+
+	return {
+		pad: clamp(BASE_OVERLAY_TEXT.pad * scale, 12, 480),
+		city: clamp(BASE_OVERLAY_TEXT.city * scale, 28, 420),
+		country: clamp(BASE_OVERLAY_TEXT.country * scale, 10, 150),
+		coords: clamp(BASE_OVERLAY_TEXT.coords * scale, 9, 120),
+		gap: clamp(BASE_OVERLAY_TEXT.gap * scale, 4, 90),
+		cityGap: clamp(BASE_OVERLAY_TEXT.cityGap * scale, 12, 280),
+		dividerWidth: clamp(BASE_OVERLAY_TEXT.dividerWidth * scale, 72, 900),
+		dividerHeight: clamp(BASE_OVERLAY_TEXT.dividerHeight * scale, 1, 12),
+		attribution: clamp(BASE_OVERLAY_TEXT.attribution * scale, 6, 72),
+		attributionOffset: clamp(BASE_OVERLAY_TEXT.attributionOffset * scale, 8, 120),
+	};
+}
+
+function applyPosterTextLayout(elements, width, height, matWidth = 0, size = 'medium') {
+	const sizeConfig = getOverlayTextConfig(width, height, size);
+	const cityToDividerGap = sizeConfig.cityGap;
+	const overlayGap = sizeConfig.gap;
+	const dividerThickness = sizeConfig.dividerHeight;
+
+	if (elements.overlay) {
+		elements.overlay.style.padding = `${sizeConfig.pad}px`;
+		elements.overlay.style.gap = '0px';
+		elements.overlay.style.rowGap = '0px';
+	}
+	if (elements.city) {
+		elements.city.style.fontSize = `${sizeConfig.city}px`;
+		elements.city.style.lineHeight = '1.12';
+		elements.city.style.margin = '0px';
+		elements.city.style.paddingTop = '0px';
+	}
+	if (elements.country) {
+		elements.country.style.fontSize = `${sizeConfig.country}px`;
+		elements.country.style.lineHeight = '1.2';
+		elements.country.style.margin = '0px';
+		elements.country.style.paddingTop = `${overlayGap}px`;
+	}
+	if (elements.coords) {
+		elements.coords.style.fontSize = `${sizeConfig.coords}px`;
+		elements.coords.style.lineHeight = '1.2';
+		elements.coords.style.margin = '0px';
+		elements.coords.style.paddingTop = `${overlayGap}px`;
+	}
+	if (elements.divider) {
+		elements.divider.style.display = 'block';
+		elements.divider.style.width = `${sizeConfig.dividerWidth}px`;
+		elements.divider.style.height = '0px';
+		elements.divider.style.margin = '0px';
+		elements.divider.style.paddingTop = `${cityToDividerGap}px`;
+		elements.divider.style.backgroundColor = 'transparent';
+		elements.divider.style.borderBottom = `${dividerThickness}px solid currentColor`;
+		elements.divider.style.color = elements.city?.style.color || 'currentColor';
+		elements.divider.style.boxSizing = 'content-box';
+	}
+	if (elements.attribution) {
+		const offset = sizeConfig.attributionOffset;
+		elements.attribution.style.fontSize = `${sizeConfig.attribution}px`;
+		elements.attribution.style.lineHeight = '1.2';
+		elements.attribution.style.right = `${matWidth + offset}px`;
+		elements.attribution.style.bottom = `${matWidth + offset}px`;
+	}
+}
 
 async function fetchTileAsBlobURL(src) {
 	try {
@@ -369,6 +465,7 @@ export async function exportToPNG(element, filename, statusElement, options = {}
 				const activeTheme = isArtistic ? artisticTheme : theme;
 				const themeColor = activeTheme.background || activeTheme.bg || activeTheme.overlayBg || '#ffffff';
 				const textColor = activeTheme.text || activeTheme.textColor || '#000000';
+				const overlaySize = state.overlaySize || 'medium';
 
 				const clonedScaler = clonedDoc.querySelector('#poster-scaler');
 				const clonedContainer = clonedDoc.querySelector('#poster-container');
@@ -533,10 +630,6 @@ export async function exportToPNG(element, filename, statusElement, options = {}
 				const attr = clonedDoc.querySelector('#poster-attribution');
 				if (attr) {
 					attr.style.color = textColor;
-					const matWidthLogical = state.matEnabled ? (state.matWidth / scale) : 0;
-					attr.style.right = `${matWidthLogical + (12 / scale)}px`;
-					attr.style.bottom = `${matWidthLogical + (12 / scale)}px`;
-					attr.style.fontSize = `${8 / scale}px`;
 					attr.style.opacity = '0.35';
 				}
 
@@ -547,29 +640,10 @@ export async function exportToPNG(element, filename, statusElement, options = {}
 					if (state.showCountry === false && state.showCoords === false) {
 						clonedDivider.style.display = 'none';
 					}
-
-					const defaultDividerOffsets = { small: 32, medium: 40, large: 56 };
-					const opts = Object.assign({}, options || {});
-					let dividerOffset = 0;
-					if (typeof opts.dividerOffset === 'number') {
-						dividerOffset = opts.dividerOffset;
-					} else if (opts.dividerOffsets && typeof opts.dividerOffsets[state.overlaySize || 'medium'] === 'number') {
-						dividerOffset = opts.dividerOffsets[state.overlaySize || 'medium'];
-					} else {
-						const sizeKey = state.overlaySize || 'medium';
-						dividerOffset = defaultDividerOffsets[sizeKey] || 0;
-					}
-
-					if (dividerOffset && city) {
-						if (dividerOffset > 0) {
-							city.style.marginBottom = dividerOffset + 'px';
-						} else {
-							clonedDivider.style.marginTop = dividerOffset + 'px';
-						}
-
-						clonedDivider.style.marginBottom = Math.round(dividerOffset * 0.2) + 'px';
-					}
 				}
+
+				const matWidthLogical = state.matEnabled ? (state.matWidth / scale) : 0;
+				applyPosterTextLayout({ overlay, city, country, coords, divider: clonedDivider, attribution: attr }, targetWidth, targetHeight, matWidthLogical, overlaySize);
 			}
 		});
 
