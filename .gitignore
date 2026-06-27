@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Secrets
+.env
+.env.*
+*.pem
+
+# Large generated (keep only the final poster we care about)
+posters/*.tmp
+

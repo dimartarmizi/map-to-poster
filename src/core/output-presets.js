@@ -49,6 +49,7 @@ export const outputPresets = {
 		{ name: '16x20 in', width: 4800, height: 6000 },
 		{ name: '18x24 in', width: 5400, height: 7200 },
 		{ name: '24x36 in', width: 7200, height: 10800 },
+		{ name: 'Ultra 48x32 in (Highest Res Vector)', width: 14400, height: 9600 },
 	],
 	paper_size: [
 		{ name: 'A0 Paper', width: 9933, height: 14043 },

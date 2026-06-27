@@ -1,6 +1,6 @@
 import L from 'leaflet';
 import maplibregl from 'maplibre-gl';
-import { state, updateState } from '../core/state.js';
+import { state, updateState, getSelectedArtisticTheme } from '../core/state.js';
 import { markerIcons } from '../core/marker-icons.js';
 import { findBestInsertIndex } from '../core/utils.js';
 import { updateRouteGeometry, syncRouteMarkers } from './route-manager.js';
@@ -81,6 +81,9 @@ function initArtisticMap(containerId, center, zoom) {
 	artisticMap.scrollZoom.setWheelZoomRate(1);
 	artisticMap.scrollZoom.setZoomRate(1 / 600);
 
+	// Ensure BR high-res vectors are injected for the initial artistic style
+	setTimeout(() => addBRVectorLayers(artisticMap), 650);
+
 	artisticMap.on('style.load', () => {
 		if (pendingArtisticStyle) {
 			const next = pendingArtisticStyle;
@@ -92,7 +95,113 @@ function initArtisticMap(containerId, center, zoom) {
 		} else {
 			styleChangeInProgress = false;
 		}
+		// Inject highest-res local BR vector data (from Neon) for crisp poster exports
+		addBRVectorLayers(artisticMap);
 	});
+
+let brLayersLoaded = false;
+
+async function addBRVectorLayers(mapInstance, themeOverride = null) {
+	if (!mapInstance || brLayersLoaded) return;
+	const theme = themeOverride || getSelectedArtisticTheme() || { water: '#0E3D6B', road_motorway: '#fff', road_primary: '#93C5FD', road_secondary: '#64748B', road_default: '#64748B', bg: '#0B1220', text: '#fff' };
+
+	const DATA_BASE = '/data/br-';
+
+	async function tryAddSource(id, url) {
+		try {
+			const res = await fetch(url);
+			if (!res.ok) return null;
+			const data = await res.json();
+			if (!data || !data.features || !data.features.length) return null;
+			if (mapInstance.getSource(id)) mapInstance.removeSource(id);
+			mapInstance.addSource(id, { type: 'geojson', data });
+			return data;
+		} catch (e) { return null; }
+	}
+
+	// Remove old BR layers if re-adding on theme switch
+	['br-hydro-fill', 'br-hydro-line', 'br-roads', 'br-buildings', 'br-neighborhoods'].forEach(id => {
+		try { if (mapInstance.getLayer(id)) mapInstance.removeLayer(id); } catch {}
+	});
+
+	// Hydro (water bodies + Mississippi) - highest detail from EBR GIS
+	const hydro = await tryAddSource('br-hydro', DATA_BASE + 'hydro.geojson');
+	if (hydro) {
+		mapInstance.addLayer({
+			id: 'br-hydro-fill',
+			type: 'fill',
+			source: 'br-hydro',
+			paint: { 'fill-color': theme.water || '#0C3D6B', 'fill-opacity': 0.95 }
+		});
+		mapInstance.addLayer({
+			id: 'br-hydro-line',
+			type: 'line',
+			source: 'br-hydro',
+			paint: { 'line-color': theme.bg || '#000', 'line-width': 0.6, 'line-opacity': 0.6 }
+		});
+	}
+
+	// Neighborhoods subtle
+	const hoods = await tryAddSource('br-neighborhoods', DATA_BASE + 'neighborhoods.geojson');
+	if (hoods) {
+		mapInstance.addLayer({
+			id: 'br-neighborhoods',
+			type: 'line',
+			source: 'br-neighborhoods',
+			paint: { 'line-color': theme.text || '#fff', 'line-width': 0.4, 'line-opacity': 0.15 }
+		});
+	}
+
+	// Buildings - architectural detail for ultra high res poster
+	const bldgs = await tryAddSource('br-buildings', DATA_BASE + 'buildings.geojson');
+	if (bldgs) {
+		mapInstance.addLayer({
+			id: 'br-buildings',
+			type: 'fill',
+			source: 'br-buildings',
+			paint: { 'fill-color': '#0A0F1C', 'fill-opacity': 0.55 }
+		});
+	}
+
+	// Roads - local classified, crisp at any export size
+	const roads = await tryAddSource('br-roads', DATA_BASE + 'roads.geojson');
+	if (roads) {
+		// base roads
+		mapInstance.addLayer({
+			id: 'br-roads',
+			type: 'line',
+			source: 'br-roads',
+			paint: {
+				'line-color': theme.road_default || '#64748B',
+				'line-width': [
+					'interpolate', ['linear'], ['zoom'],
+					9, 0.6,
+					12, 1.2,
+					15, 2.2
+				],
+				'line-opacity': 0.95
+			}
+		});
+		// thicker motorways / arterials
+		mapInstance.addLayer({
+			id: 'br-roads-major',
+			type: 'line',
+			source: 'br-roads',
+			filter: ['in', ['get', 'class'], ['literal', ['INTERSTATE', 'OTHER PRINCIPAL ARTERIAL', 'MINOR ARTERIAL']]],
+			paint: {
+				'line-color': theme.road_motorway || theme.road_primary || '#fff',
+				'line-width': [
+					'interpolate', ['linear'], ['zoom'],
+					9, 1.2,
+					12, 2.4,
+					15, 4.5
+				]
+			}
+		});
+	}
+
+	brLayersLoaded = true;
+}
 
 	artisticMap.on('moveend', () => {
 		if (isSyncing) return;
@@ -186,6 +295,7 @@ export function updateArtisticStyle(theme) {
 	}
 
 	styleChangeInProgress = true;
+	brLayersLoaded = false;
 	try {
 		artisticMap.setStyle(style);
 	} catch (e) {
