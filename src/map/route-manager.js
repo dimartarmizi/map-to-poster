@@ -50,7 +50,7 @@ export function updateRouteStyles(state) {
 
 	const isArtistic = state.renderMode === 'artistic';
 	const theme = isArtistic ? getSelectedArtisticTheme() : getSelectedTheme();
-	const color = theme.route || '#EF4444';
+	const color = state.routeColor || theme.route || '#EF4444';
 	const casingColor = isArtistic ? (theme.bg || '#ffffff') : (theme.background || '#ffffff');
 
 	if (state.showRoute) {

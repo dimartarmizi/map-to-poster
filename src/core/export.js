@@ -2,7 +2,7 @@ import html2canvas from 'html2canvas';
 import { getMapInstance, getArtisticMapInstance } from '../map/map-init.js';
 import { state, getSelectedTheme, getSelectedArtisticTheme } from './state.js';
 import { markerIcons as markerIcons } from './marker-icons.js';
-import { hexToRgba } from './utils.js';
+import { hexToRgba, getTextShadowCSS } from './utils.js';
 
 function project(lat, lon, scale) {
 	const siny = Math.sin(lat * Math.PI / 180);
@@ -68,6 +68,12 @@ function applyPosterTextLayout(elements, width, height, matWidth = 0, size = 'me
 	const overlayGap = sizeConfig.gap;
 	const dividerThickness = sizeConfig.dividerHeight;
 
+	const isArtistic = state.renderMode === 'artistic';
+	const shadowTheme = isArtistic ? getSelectedArtisticTheme() : getSelectedTheme();
+	const shadowTextColor = shadowTheme.text || shadowTheme.textColor || '#000000';
+	const shadowScale = sizeConfig.city / BASE_OVERLAY_TEXT.city;
+	const textShadow = getTextShadowCSS(state.textShadow, shadowTextColor, shadowScale);
+
 	if (elements.overlay) {
 		elements.overlay.style.padding = `${sizeConfig.pad}px`;
 		elements.overlay.style.gap = '0px';
@@ -78,18 +84,21 @@ function applyPosterTextLayout(elements, width, height, matWidth = 0, size = 'me
 		elements.city.style.lineHeight = '1.12';
 		elements.city.style.margin = '0px';
 		elements.city.style.paddingTop = '0px';
+		elements.city.style.textShadow = textShadow;
 	}
 	if (elements.country) {
 		elements.country.style.fontSize = `${sizeConfig.country}px`;
 		elements.country.style.lineHeight = '1.2';
 		elements.country.style.margin = '0px';
 		elements.country.style.paddingTop = `${overlayGap}px`;
+		elements.country.style.textShadow = textShadow;
 	}
 	if (elements.coords) {
 		elements.coords.style.fontSize = `${sizeConfig.coords}px`;
 		elements.coords.style.lineHeight = '1.2';
 		elements.coords.style.margin = '0px';
 		elements.coords.style.paddingTop = `${overlayGap}px`;
+		elements.coords.style.textShadow = textShadow;
 	}
 	if (elements.divider) {
 		elements.divider.style.display = 'block';
@@ -205,7 +214,7 @@ async function captureMapSnapshot() {
 					const centerPoint = project(center.lat, center.lng, scale);
 
 					const theme = getSelectedArtisticTheme();
-					const color = theme.route || '#EF4444';
+					const color = state.markerColor || theme.route || '#EF4444';
 
 					for (const markerData of state.markers) {
 						const markerPoint = project(markerData.lat, markerData.lon, scale);
@@ -222,7 +231,7 @@ async function captureMapSnapshot() {
 					const centerPoint = project(center.lat, center.lng, scale);
 
 					const theme = getSelectedArtisticTheme();
-					const color = theme.route || '#EF4444';
+					const color = state.routeColor || theme.route || '#EF4444';
 					const themeBg = theme.bg || '#ffffff';
 
 					const geometry = (state.routeGeometry && state.routeGeometry.length > 0)
@@ -294,7 +303,7 @@ async function captureMapSnapshot() {
 				const centerPoint = project(center.lat, center.lng, scaleMap);
 
 				const theme = getSelectedTheme();
-				const color = theme.route || '#EF4444';
+				const color = state.markerColor || theme.route || '#EF4444';
 
 				for (const markerData of state.markers) {
 					const markerPoint = project(markerData.lat, markerData.lon, scaleMap);
@@ -313,7 +322,7 @@ async function captureMapSnapshot() {
 
 				const theme = getSelectedTheme();
 				const themeBg = theme.background || '#ffffff';
-				const routeColor = theme.route || '#EF4444';
+				const routeColor = state.routeColor || theme.route || '#EF4444';
 
 				const via = state.routeViaPoints || [];
 				const geometry = (state.routeGeometry && state.routeGeometry.length > 0)
