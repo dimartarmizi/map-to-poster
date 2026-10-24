@@ -1,5 +1,5 @@
 import { state, updateState, defaultState, getSelectedTheme, getSelectedArtisticTheme } from '../core/state.js';
-import { hexToRgba } from '../core/utils.js';
+import { hexToRgba, getTextShadowCSS } from '../core/utils.js';
 import { artisticThemes } from '../core/artistic-themes.js';
 import { themes } from '../core/themes.js';
 import { outputPresets } from '../core/output-presets.js';
@@ -15,6 +15,47 @@ import {
 } from '../map/map-init.js';
 import { searchLocation, formatCoords } from '../map/geocoder.js';
 
+
+function setupColorSwatches(containerId, pickerId, stateKey, onChange) {
+	const container = document.getElementById(containerId);
+	if (!container) return;
+	container.querySelectorAll('button[data-color]').forEach(btn => {
+		btn.addEventListener('click', () => {
+			updateState({ [stateKey]: btn.dataset.color });
+			onChange();
+		});
+	});
+	const picker = document.getElementById(pickerId);
+	if (picker) {
+		picker.addEventListener('input', (e) => {
+			updateState({ [stateKey]: e.target.value });
+			onChange();
+		});
+	}
+}
+
+function syncColorSwatches(containerId, pickerId, value, themeColor) {
+	const container = document.getElementById(containerId);
+	if (!container) return;
+	const normalized = (value || '').toLowerCase();
+	let matched = false;
+	container.querySelectorAll('button[data-color]').forEach(btn => {
+		const isActive = btn.dataset.color.toLowerCase() === normalized;
+		btn.classList.toggle('active', isActive);
+		if (isActive) matched = true;
+	});
+	const customSwatch = container.querySelector('.color-swatch-custom');
+	if (customSwatch) {
+		const isCustom = !!normalized && !matched;
+		customSwatch.classList.toggle('active', isCustom);
+		customSwatch.style.background = isCustom ? value : '';
+	}
+	const picker = document.getElementById(pickerId);
+	if (picker) {
+		const effective = value || themeColor;
+		if (/^#[0-9a-fA-F]{6}$/.test(effective)) picker.value = effective;
+	}
+}
 
 export function setupControls() {
 	const searchInput = document.getElementById('search-input');
@@ -109,6 +150,7 @@ export function setupControls() {
 
 	const overlayBgButtons = document.querySelectorAll('.overlay-bg-btn');
 	const overlaySizeButtons = document.querySelectorAll('.overlay-size-btn');
+	const textShadowButtons = document.querySelectorAll('.text-shadow-btn');
 	const overlaySizeGroup = document.getElementById('overlay-size-group');
 	const customW = document.getElementById('custom-w');
 	const customH = document.getElementById('custom-h');
@@ -171,6 +213,9 @@ export function setupControls() {
 			if (markerSizeValue) markerSizeValue.textContent = `${size}px`;
 		});
 	}
+
+	setupColorSwatches('marker-color-swatches', 'marker-color-picker', 'markerColor', () => updateMarkerStyles(state));
+	setupColorSwatches('route-color-swatches', 'route-color-picker', 'routeColor', () => updateRouteStyles(state));
 
 	const logoBtn = document.getElementById('logo-btn');
 	const creditsModal = document.getElementById('credits-modal');
@@ -857,6 +902,14 @@ export function setupControls() {
 		});
 	}
 
+	if (textShadowButtons) {
+		textShadowButtons.forEach(btn => {
+			btn.addEventListener('click', () => {
+				updateState({ textShadow: btn.dataset.shadow });
+			});
+		});
+	}
+
 	if (overlaySizeGroup && overlaySizeButtons) {
 		overlaySizeButtons.forEach(btn => {
 			btn.addEventListener('click', (e) => {
@@ -1136,6 +1189,19 @@ export function setupControls() {
 			});
 		}
 
+		if (textShadowButtons && textShadowButtons.length) {
+			textShadowButtons.forEach(b => {
+				const s = b.dataset.shadow;
+				if (s === (currentState.textShadow || 'none')) {
+					b.classList.add('bg-accent', 'text-white');
+					b.classList.remove('bg-slate-50');
+				} else {
+					b.classList.remove('bg-accent', 'text-white');
+					b.classList.add('bg-slate-50');
+				}
+			});
+		}
+
 		if (customW) customW.value = currentState.width;
 		if (customH) customH.value = currentState.height;
 
@@ -1151,6 +1217,14 @@ export function setupControls() {
 			const sizePx = Math.round((currentState.markerSize || 1) * 40);
 			markerSizeSlider.value = sizePx;
 			if (markerSizeValue) markerSizeValue.textContent = `${sizePx}px`;
+		}
+
+		{
+			const isArtistic = currentState.renderMode === 'artistic';
+			const swatchTheme = isArtistic ? getSelectedArtisticTheme() : getSelectedTheme();
+			const markerThemeColor = swatchTheme.route || (isArtistic ? (swatchTheme.text || '#0f172a') : (swatchTheme.textColor || '#0f172a'));
+			syncColorSwatches('marker-color-swatches', 'marker-color-picker', currentState.markerColor || '', markerThemeColor);
+			syncColorSwatches('route-color-swatches', 'route-color-picker', currentState.routeColor || '', swatchTheme.route || '#EF4444');
 		}
 
 		if (matToggle) matToggle.checked = !!currentState.matEnabled;
@@ -1277,6 +1351,12 @@ function applyPosterTextLayout(elements, currentState) {
 	const sizeConfig = getOverlayTextConfig(currentState.width, currentState.height, size);
 	const overlayGap = sizeConfig.gap;
 
+	const isArtistic = currentState.renderMode === 'artistic';
+	const shadowTheme = isArtistic ? getSelectedArtisticTheme() : getSelectedTheme();
+	const shadowTextColor = shadowTheme.text || shadowTheme.textColor || '#000000';
+	const shadowScale = sizeConfig.city / BASE_OVERLAY_TEXT.city;
+	const textShadow = getTextShadowCSS(currentState.textShadow, shadowTextColor, shadowScale);
+
 	if (elements.overlay) {
 		elements.overlay.style.padding = `${sizeConfig.pad}px`;
 		elements.overlay.style.gap = `${overlayGap}px`;
@@ -1285,16 +1365,19 @@ function applyPosterTextLayout(elements, currentState) {
 		elements.city.style.fontSize = `${sizeConfig.city}px`;
 		elements.city.style.lineHeight = '1.12';
 		elements.city.style.margin = '0px';
+		elements.city.style.textShadow = textShadow;
 	}
 	if (elements.country) {
 		elements.country.style.fontSize = `${sizeConfig.country}px`;
 		elements.country.style.lineHeight = '1.2';
 		elements.country.style.margin = '0px';
+		elements.country.style.textShadow = textShadow;
 	}
 	if (elements.coords) {
 		elements.coords.style.fontSize = `${sizeConfig.coords}px`;
 		elements.coords.style.lineHeight = '1.2';
 		elements.coords.style.margin = '0px';
+		elements.coords.style.textShadow = textShadow;
 	}
 	if (elements.divider) {
 		elements.divider.style.width = `${sizeConfig.dividerWidth}px`;

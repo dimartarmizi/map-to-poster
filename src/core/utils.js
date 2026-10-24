@@ -19,6 +19,28 @@ export function hexToRgba(color, alpha = 1) {
 	return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+export function getTextShadowCSS(type, textColor, scale = 1) {
+	if (!type || type === 'none') return 'none';
+
+	let luminance = 0;
+	let h = (textColor || '').replace('#', '');
+	if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+	if (/^[0-9A-Fa-f]{6}$/.test(h)) {
+		const r = parseInt(h.substring(0, 2), 16);
+		const g = parseInt(h.substring(2, 4), 16);
+		const b = parseInt(h.substring(4, 6), 16);
+		luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+	}
+
+	const c = luminance > 0.5 ? '15, 23, 42' : '248, 250, 252';
+	const s = (v) => Math.max(1, Math.round(v * scale));
+
+	if (type === 'soft') return `0 ${s(1)}px ${s(3)}px rgba(${c}, 0.55), 0 ${s(2)}px ${s(10)}px rgba(${c}, 0.35)`;
+	if (type === 'strong') return `0 ${s(2)}px ${s(4)}px rgba(${c}, 0.9), 0 ${s(4)}px ${s(16)}px rgba(${c}, 0.6)`;
+	if (type === 'halo') return `0 0 ${s(2)}px rgba(${c}, 0.95), 0 0 ${s(6)}px rgba(${c}, 0.8), 0 0 ${s(14)}px rgba(${c}, 0.6)`;
+	return 'none';
+}
+
 export function findBestInsertIndex(lat, lon, routePoints) {
 	if (routePoints.length < 2) return 0;
 

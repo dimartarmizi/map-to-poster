@@ -103,6 +103,47 @@ body.loaded {
 		@apply translate-x-5;
 	}
 
+	.color-swatch {
+		@apply w-6 h-6 rounded-full border border-slate-200 cursor-pointer transition-all duration-150 shrink-0 ring-2 ring-transparent ring-offset-1;
+	}
+
+	.color-swatch:hover {
+		@apply scale-110;
+	}
+
+	.color-swatch.active {
+		@apply ring-accent scale-105 border-white shadow-sm;
+	}
+
+	.color-swatch-auto {
+		@apply h-6 px-2.5 rounded-full border border-slate-200 bg-white text-[9px] font-bold uppercase tracking-wider text-slate-500 cursor-pointer transition-all duration-150 shrink-0 ring-2 ring-transparent ring-offset-1;
+	}
+
+	.color-swatch-auto:hover {
+		@apply text-slate-700 border-slate-300;
+	}
+
+	.color-swatch-auto.active {
+		@apply ring-accent text-accent border-white shadow-sm;
+	}
+
+	.color-swatch-custom {
+		@apply relative w-6 h-6 rounded-full border border-slate-200 cursor-pointer overflow-hidden transition-all duration-150 shrink-0 ring-2 ring-transparent ring-offset-1;
+		background: conic-gradient(#ef4444, #facc15, #22c55e, #22d3ee, #3b82f6, #a855f7, #ef4444);
+	}
+
+	.color-swatch-custom:hover {
+		@apply scale-110;
+	}
+
+	.color-swatch-custom.active {
+		@apply ring-accent scale-105 border-white shadow-sm;
+	}
+
+	.color-swatch-custom input[type="color"] {
+		@apply absolute inset-0 w-full h-full opacity-0 cursor-pointer;
+	}
+
 	input[type="range"]::-webkit-slider-thumb {
 		@apply appearance-none w-4 h-4 rounded-full bg-accent cursor-pointer border-2 border-white shadow-sm transition-transform active:scale-110;
 	}
