@@ -100,13 +100,19 @@ Follow these steps to get a local copy up and running.
    npm install
    ```
 
-3. **Start development server**
+3. **Configure Environment**
+   ```bash
+   cp .env.example .env
+   ```
+   Add your free CARTO API key from [carto.com/basemaps/apikey](https://carto.com/basemaps/apikey) to `VITE_CARTO_API_KEY` in `.env` (required for Minimal White, Midnight Dark, and Modern Voyager basemaps).
+
+4. **Start development server**
    ```bash
    npm run dev
    ```
    The app will be available at `http://localhost:5173`.
 
-4. **Build for production**
+5. **Build for production**
    ```bash
    npm run build
    ```

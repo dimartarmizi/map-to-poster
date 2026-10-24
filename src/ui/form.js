@@ -1523,6 +1523,7 @@ export function updatePreviewStyles(currentState) {
 	}
 	if (attribution) {
 		attribution.style.color = activeTheme.text || activeTheme.textColor;
+		attribution.textContent = activeTheme.attribution || "© OpenStreetMap contributors, © CARTO";
 	}
 
 	updateMarkerStyles(currentState);
